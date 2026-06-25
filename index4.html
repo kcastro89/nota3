@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consulta de Calificaciones · Profa. Karla Castro</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --canvas: #FBFBF7; --canvas2: #EBF2EE;
+  --sage: #5A8F76; --sage-dark: #2C5E47; --sage-light: #A3C6B6;
+  --text: #1E2E26; --text-muted: #586E64; --white: #FFFFFF;
+  --border: #D2DFD8; --border-dark: #8FA89B;
+  --radius: 6px; --radius-sm: 4px; --shadow: 0 4px 16px rgba(44,94,71,.05);
+}
+body{ background: var(--canvas); font-family: 'Lato', sans-serif; color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+.site-header{ background: linear-gradient(135deg, var(--sage-dark) 0%, var(--sage) 60%, #7AA892 100%); padding: 25px 20px; text-align: center; border-bottom: 4px double var(--sage-light); color:#fff; }
+.instituto-name{ font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; }
+main{ flex: 1; max-width: 950px; width: 100%; margin: 0 auto; padding: 30px 20px; }
+.card{ background: var(--white); border: 1px solid var(--border-dark); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow); position: relative; }
+.card::after{ content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--sage); border-radius: var(--radius) var(--radius) 0 0; }
+.card-title{ font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--sage-dark); margin-bottom: 15px; text-align: center; }
+.search-box{ display: flex; gap: 10px; margin-top: 15px; }
+input{ background: var(--canvas); border: 1px solid var(--border-dark); border-radius: var(--radius-sm); padding: 12px; color: var(--text); font-size: 15px; outline: none; flex: 1; text-align: center; letter-spacing: 1px; }
+input:focus{ border-color: var(--sage); background: #fff; }
+.btn{ padding: 12px 24px; background: var(--sage-dark); color: #fff; border: 1px solid var(--sage-dark); border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: all .2s; }
+.btn:hover{ background: var(--sage); }
+.error-msg{ color: #A64444; background: #FFF0F0; padding: 12px; border-radius: var(--radius-sm); border: 1px solid #E6B8B8; margin-top: 15px; font-size: 14px; text-align: center; display: none; }
+.student-info{ margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-dark); font-size: 15px; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--border-dark); border-radius: var(--radius-sm); margin-top: 15px; }
+.boleta-table{ width: 100%; border-collapse: collapse; font-size: 12px; min-width: 850px; }
+.boleta-table th{ background: var(--canvas2); color: var(--sage-dark); font-family: 'Playfair Display', serif; font-weight: 700; padding: 8px 4px; border: 1px solid var(--border-dark); }
+.boleta-table td{ padding: 10px 4px; text-align: center; border: 1px solid var(--border-dark); background: #FFF; }
+.materia-name{ text-align: left; font-weight: 700; color: var(--text); background: var(--canvas) !important; padding-left: 10px !important; }
+.parcial-total{ font-weight: 700; background: #F4FAF7 !important; color: var(--sage-dark); }
+.promedio-final{ font-weight: 800; font-size: 13px; background: #EBF2EE !important; color: #1E2E26; }
+.hidden{ display: none !important; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="instituto-name">SISTEMA DE CALIFICACIONES INSTITUCIONAL</div>
+  <div style="font-size:13px; opacity:0.9; margin-top:5px;">Control de Notas · Profa. Karla Castro</div>
+</header>
+
+<main>
+  <!-- Caja de Consulta -->
+  <div class="card">
+    <div class="card-title">🔍 Consulta de Rendimiento Académico</div>
+    <p style="font-size: 13px; color: var(--text-muted); text-align: center;">Por seguridad, ingrese el número de identidad completo del estudiante (13 dígitos, sin guiones).</p>
+    
+    <div class="search-box">
+      <input type="text" id="txt-identidad" placeholder="Ej: 0801199012345" maxlength="13">
+      <button class="btn" onclick="buscarCalificaciones()">Buscar</button>
+    </div>
+    
+    <div id="error-box" class="error-msg"></div>
+  </div>
+
+  <!-- Contenedor de la Boleta de Calificaciones -->
+  <div id="card-boleta" class="card hidden">
+    <div class="student-info">
+      <p style="margin-bottom: 5px;"><b>Estudiante:</b> <span id="lbl-nombre">—</span></p>
+      <p style="font-size:13px; color:var(--text-muted);"><b>Identidad:</b> <span id="lbl-identidad">—</span></p>
+    </div>
+
+    <h3 style="font-family:'Playfair Display', serif; font-size: 16px; color: var(--sage-dark); margin-bottom: 10px;">📋 Cuadro General de Notas</h3>
+    <div class="table-wrap">
+      <table class="boleta-table">
+        <thead>
+          <tr>
+            <th rowspan="2" style="min-width: 200px;">Asignatura / Espacio Curricular</th>
+            <th colspan="3">I Parcial</th>
+            <th colspan="3">II Parcial</th>
+            <th colspan="3">III Parcial</th>
+            <th colspan="3">IV Parcial</th>
+            <th rowspan="2" style="background: #DEEAE3; width: 80px;">PROMEDIO<br>FINAL</th>
+          </tr>
+          <tr>
+            <th style="font-size:10px; width:45px;">Ac</th><th style="font-size:10px; width:45px;">Ex</th><th style="font-size:10px; width:45px; background: #E6F0EC;">To</th>
+            <th style="font-size:10px; width:45px;">Ac</th><th style="font-size:10px; width:45px;">Ex</th><th style="font-size:10px; width:45px; background: #E6F0EC;">To</th>
+            <th style="font-size:10px; width:45px;">Ac</th><th style="font-size:10px; width:45px;">Ex</th><th style="font-size:10px; width:45px; background: #E6F0EC;">To</th>
+            <th style="font-size:10px; width:45px;">Ac</th><th style="font-size:10px; width:45px;">Ex</th><th style="font-size:10px; width:45px; background: #E6F0EC;">To</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-boleta">
+          <!-- Se llena dinámicamente -->
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size: 11px; color: var(--text-muted); margin-top: 10px; text-align: right;">*Ac: Acumulado | Ex: Examen | To: Nota Total del Parcial</p>
+  </div>
+</main>
+
+<script>
+let NOTAS_ALUMNOS = null;
+
+function cargarBaseDatos() {
+  fetch('notas_alumnos.json?t=' + new Date().getTime())
+    .then(response => {
+      if (!response.ok) throw new Error('No se encuentra el archivo de datos.');
+      return response.json();
+    })
+    .then(data => {
+      NOTAS_ALUMNOS = data;
+      console.log("Base de datos cargada correctamente.");
+    })
+    .catch(err => {
+      console.error("Error al cargar las calificaciones:", err);
+    });
+}
+
+function buscarCalificaciones() {
+  const idBusqueda = document.getElementById('txt-identidad').value.trim();
+  const errorBox = document.getElementById('error-box');
+  const cardBoleta = document.getElementById('card-boleta');
+  
+  errorBox.style.display = 'none';
+  cardBoleta.classList.add('hidden');
+
+  if (idBusqueda.length !== 13) {
+    errorBox.textContent = "La identidad debe tener exactamente 13 dígitos.";
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  if (!NOTAS_ALUMNOS) {
+    errorBox.textContent = "El archivo 'notas_alumnos.json' no se encuentra en esta carpeta. Genérelo desde el panel docente y colóquelo aquí.";
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  const alumno = NOTAS_ALUMNOS[idBusqueda];
+
+  if (!alumno) {
+    errorBox.textContent = "No se encontraron registros asociados a esa identidad. Verifique e intente de nuevo.";
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  document.getElementById('lbl-nombre').textContent = alumno.nombre;
+  document.getElementById('lbl-identidad').textContent = idBusqueda;
+
+  const tbody = document.getElementById('tbody-boleta');
+  tbody.innerHTML = '';
+
+  Object.keys(alumno.asignaturas).forEach(materia => {
+    const notas = alumno.asignaturas[materia];
+    const tr = document.createElement('tr');
+    
+    // Calcular totales parciales y preparar el promedio final
+    let sumaTotales = 0;
+    let parcialesContados = 0;
+
+    const pKeys = ['I', 'II', 'III', 'IV'];
+    let celdasHTML = '';
+
+    pKeys.forEach(p => {
+      const pData = notas[p];
+      if (pData && pData.cursado) {
+        const acum = parseFloat(pData.acum) || 0;
+        const exam = parseFloat(pData.examen) || 0;
+        const totalParcial = Math.round(acum + exam);
+
+        celdasHTML += `<td>${acum.toFixed(1)}</td>`;
+        celdasHTML += `<td>${exam}</td>`;
+        celdasHTML += `<td class="parcial-total">${totalParcial}</td>`;
+        
+        sumaTotales += totalParcial;
+        parcialesContados++;
+      } else {
+        celdasHTML += `<td>-</td><td>-</td><td class="parcial-total">-</td>`;
+      }
+    });
+
+    // Calcular promedio basándose en los parciales evaluados hasta el momento
+    const promedio = parcialesContados > 0 ? Math.round(sumaTotales / parcialesContados) : 0;
+
+    tr.innerHTML = `
+      <td class="materia-name">${materia.replace(/_/g, ' ')}</td>
+      ${celdasHTML}
+      <td class="promedio-final">${parcialesContados > 0 ? promedio : '-'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  cardBoleta.classList.remove('hidden');
+}
+
+window.onload = cargarBaseDatos;
+</script>
+</body>
+</html>
