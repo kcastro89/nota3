@@ -7,16 +7,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    /* Paleta de Lujo Silencioso y Exclusividad (Rebajando el morado) */
-    --c-space-dark: #120A16; /* Uva ultra oscuro casi negro */
-    --c-deep-wine: #26172B;  /* Vino/Uva profundo de fondo */
-    --c-velvet: #422D47;     /* Toque sutil de terciopelo atenuado */
-    --c-gold-satin: #C5A880; /* Dorado champán/satinado elegante */
-    --c-silk-cream: #FDFBF7; /* Crema de seda de alta costura */
-    --c-soft-gray: #F4EFF6;  /* Gris claro suavizado con matiz uva */
+    /* Paleta Suave, Clara y Luminosa */
+    --c-cream-bg: #FBE4D8;   /* Fondo crema suave satinado */
+    --c-nude-soft: #DFB6B2;  /* Tono rosa nude elegante para bordes y acentos */
+    --c-berry-accent: #854F6C; /* Tono intermedio para subtextos y detalles */
+    --c-plum-text: #522B5B;    /* Tono ciruela para títulos y botones */
+    --c-fine-dark: #2B124C;    /* Color ultra oscuro (usado ÚNICAMENTE para máxima legibilidad de textos) */
     
-    --text-dark: #120A16;
-    --text-muted: #5A4E5E;
+    --shadow-floating: 0 30px 60px rgba(82, 43, 91, 0.15), 0 12px 25px rgba(0, 0, 0, 0.04);
   }
 
   *, *::before, *::after { 
@@ -27,10 +25,10 @@
 
   body {
     font-family: 'Inter', sans-serif;
-    /* Degradado liso de alta gama, sutil y opulento */
-    background: linear-gradient(135deg, var(--c-deep-wine) 0%, var(--c-space-dark) 100%);
+    /* Fondo sumamente suave e iluminado */
+    background: linear-gradient(135deg, #FFFFFF 0%, var(--c-cream-bg) 50%, var(--c-nude-soft) 100%);
     background-attachment: fixed;
-    color: var(--text-dark);
+    color: var(--c-fine-dark);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -42,17 +40,16 @@
 
   header {
     text-align: center;
-    margin-bottom: 60px;
+    margin-bottom: 40px;
     z-index: 10;
   }
 
-  /* Nombre de la Institución: Sofisticado, elegante y de élite */
   .inst-title {
     font-family: 'Playfair Display', serif;
-    font-size: 36px;
+    font-size: 34px;
     font-weight: 600;
-    letter-spacing: 1px;
-    color: var(--c-silk-cream);
+    letter-spacing: 0.5px;
+    color: var(--c-fine-dark);
     line-height: 1.3;
     max-width: 800px;
     margin: 0 auto;
@@ -60,47 +57,63 @@
 
   .docente-name {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 18px;
+    font-size: 20px;
     font-style: italic;
-    font-weight: 400;
-    color: var(--c-gold-satin);
-    margin-top: 12px;
-    letter-spacing: 3px;
+    font-weight: 600;
+    color: var(--c-berry-accent);
+    margin-top: 10px;
+    letter-spacing: 2px;
   }
 
-  /* PANEL PRINCIPAL: Minimalismo exclusivo de alta costura */
+  /* PANEL CENTRAL: Tarjeta blanca impecable */
   .container-card {
-    background: var(--c-silk-cream);
-    border: 1px solid rgba(197, 168, 128, 0.3);
+    background: #FFFFFF;
+    border: 1px solid rgba(223, 182, 178, 0.5);
     border-radius: 32px; 
     max-width: 560px;
     width: 100%;
     margin: 0 auto 60px auto;
-    padding: 60px 45px;
+    padding: 50px 45px;
     position: relative;
     z-index: 5;
-    box-shadow: 
-      0 40px 90px rgba(18, 10, 22, 0.6),
-      inset 0 1px 1px rgba(255, 255, 255, 0.9);
+    box-shadow: 0 40px 80px rgba(82, 43, 91, 0.06);
+  }
+
+  /* LOGO INSTITUCIONAL OFICIAL INTEGRADO */
+  .institution-logo-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+  }
+
+  .institution-logo {
+    width: 130px;
+    height: 130px;
+    object-fit: contain;
+    border-radius: 50%;
+    background: #FFFFFF;
+    padding: 4px;
+    border: 2px solid var(--c-nude-soft);
+    box-shadow: 0 12px 28px rgba(82, 43, 91, 0.08);
   }
 
   h2 {
     font-family: 'Playfair Display', serif;
-    font-size: 34px;
+    font-size: 32px;
     font-weight: 400;
     margin-bottom: 12px;
     text-align: center;
     letter-spacing: -0.5px;
-    color: var(--text-dark);
+    color: var(--c-fine-dark);
   }
 
   .subtitle {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 16px;
+    font-size: 17px;
     font-style: italic;
-    color: var(--text-muted);
+    color: var(--c-berry-accent);
     text-align: center;
-    margin-bottom: 50px;
+    margin-bottom: 45px;
     line-height: 1.5;
   }
 
@@ -113,12 +126,12 @@
   input[type="text"] {
     width: 100%;
     border: none;
-    border-bottom: 1px solid rgba(18, 10, 22, 0.2);
+    border-bottom: 1px solid var(--c-nude-soft);
     background: transparent;
     padding: 15px 0;
     font-family: 'Inter', sans-serif;
     font-size: 22px;
-    color: var(--text-dark);
+    color: var(--c-fine-dark);
     outline: none;
     font-weight: 300;
     text-align: center;
@@ -127,18 +140,17 @@
   }
 
   input[type="text"]:focus {
-    border-bottom: 1px solid var(--c-gold-satin);
+    border-bottom: 2px solid var(--c-berry-accent);
   }
 
-  /* Botón de Estilo Atelier Exclusivo */
   .btn-submit {
     display: block;
     width: 100%;
-    background: var(--c-space-dark);
-    color: var(--c-silk-cream);
-    border: 1px solid var(--c-gold-satin);
+    background: var(--c-plum-text);
+    color: #FFFFFF;
+    border: none;
     padding: 20px;
-    border-radius: 12px;
+    border-radius: 14px;
     font-family: 'Inter', sans-serif;
     font-weight: 500;
     font-size: 13px;
@@ -148,31 +160,28 @@
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     text-align: center;
     text-transform: uppercase;
+    box-shadow: 0 10px 25px rgba(82, 43, 91, 0.2);
   }
 
   .btn-submit:hover {
-    background: var(--c-deep-wine);
+    background: var(--c-fine-dark);
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(18, 10, 22, 0.25);
-  }
-
-  .btn-submit:active {
-    transform: translateY(0);
+    box-shadow: 0 15px 30px rgba(82, 43, 91, 0.3);
   }
 
   .btn-logout {
     background: transparent;
-    color: var(--text-dark);
+    color: var(--c-berry-accent);
     font-size: 11px;
     padding: 12px;
     margin-top: 50px;
-    border: 1px solid rgba(18, 10, 22, 0.15);
+    border: 1px solid var(--c-nude-soft);
     border-radius: 8px;
+    box-shadow: none;
   }
   
   .btn-logout:hover {
-    background: rgba(18, 10, 22, 0.02);
-    box-shadow: none;
+    background: rgba(223, 182, 178, 0.15);
     transform: none;
   }
 
@@ -180,20 +189,19 @@
     display: flex;
     align-items: center;
     gap: 25px;
-    background: #FFFFFF;
+    background: var(--c-cream-bg);
     padding: 20px;
     border-radius: 20px;
-    border: 1px solid rgba(18, 10, 22, 0.06);
+    border: 1px solid rgba(223, 182, 178, 0.3);
     margin-bottom: 45px;
-    box-shadow: 0 10px 30px rgba(18, 10, 22, 0.02);
   }
 
   .profile-circle {
     width: 76px;
     height: 76px;
     border-radius: 50%;
-    border: 1px solid var(--c-gold-satin);
-    background: var(--c-soft-gray);
+    border: 2px solid var(--c-berry-accent);
+    background: #FFFFFF;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -208,69 +216,79 @@
 
   .file-input-label {
     font-size: 11px;
-    background: var(--c-space-dark);
-    color: var(--c-silk-cream);
+    background: #FFFFFF;
+    color: var(--c-fine-dark);
     padding: 10px 22px;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    border: 1px solid var(--c-gold-satin);
-    transition: background 0.2s;
+    border: 1px solid var(--c-nude-soft);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    transition: all 0.2s;
   }
 
   .file-input-label:hover {
-    background: var(--c-velvet);
+    background: var(--c-cream-bg);
   }
 
   .materia-title {
     font-family: 'Playfair Display', serif;
     font-size: 24px;
-    font-weight: 400;
+    font-weight: 600;
     margin-top: 60px;
     margin-bottom: 35px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(18, 10, 22, 0.1);
+    border-bottom: 2px solid var(--c-cream-bg);
     padding-bottom: 15px;
-    letter-spacing: -0.2px;
+    color: var(--c-plum-text);
   }
 
   .promedio-badge {
     font-family: 'Inter', sans-serif; 
     font-size: 12px; 
     font-weight: 600; 
-    background: var(--c-soft-gray); 
-    color: var(--text-dark);
+    background: var(--c-cream-bg); 
+    color: var(--c-fine-dark);
     padding: 8px 18px; 
     border-radius: 30px;
-    border: 1px solid rgba(18, 10, 22, 0.05);
-    letter-spacing: 0.5px;
+    border: 1px solid var(--c-nude-soft);
   }
 
-  /* BLOQUES PARCIALES EFECTO FLOTANTE INGRÁVIDO */
+  /* BLOQUES PARCIALES CON EFECTO SUSPENDIDO / LEVITACIÓN CONTINUA */
   .parcial-block {
-    border: 1px solid rgba(18, 10, 22, 0.04);
-    border-radius: 20px;
+    border: 1px solid rgba(223, 182, 178, 0.3);
+    border-radius: 24px;
     padding: 28px;
-    margin-bottom: 40px;
+    margin-bottom: 45px;
     background: #FFFFFF;
     position: relative;
-    /* Efecto de flotación premium mediante sombras suaves multicapa */
-    box-shadow: 
-      0 15px 35px rgba(27, 22, 30, 0.06),
-      0 5px 15px rgba(0, 0, 0, 0.02);
+    
+    /* Efecto visual de flotar (Sombra profunda muy difuminada) */
+    box-shadow: var(--shadow-floating);
+    
+    /* Animación fluida de flotación */
+    animation: floatingAnimation 4.5s ease-in-out infinite alternate;
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
+  /* Desfase para que los bloques no floten simétricamente */
+  .parcial-block:nth-child(even) {
+    animation-delay: 2s;
+  }
+
   .parcial-block:hover {
-    /* Al pasar el cursor incrementa su altura de flotación de forma sofisticada */
-    transform: translateY(-8px);
-    box-shadow: 
-      0 30px 60px rgba(27, 22, 30, 0.12),
-      0 10px 20px rgba(0, 0, 0, 0.03);
+    /* Al colocar el cursor encima, se eleva drásticamente */
+    transform: translateY(-14px);
+    box-shadow: 0 40px 80px rgba(82, 43, 91, 0.22), 0 15px 35px rgba(0, 0, 0, 0.05);
+  }
+
+  @keyframes floatingAnimation {
+    0% { transform: translateY(0px); }
+    100% { transform: translateY(-8px); }
   }
 
   .parcial-header {
@@ -278,10 +296,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-weight: 400;
-    font-size: 19px;
-    color: var(--text-dark);
-    border-bottom: 1px solid rgba(18, 10, 22, 0.06);
+    font-weight: 600;
+    font-size: 20px;
+    color: var(--c-fine-dark);
+    border-bottom: 1px solid var(--c-cream-bg);
     padding-bottom: 12px;
   }
 
@@ -293,17 +311,17 @@
   }
 
   .act-box {
-    background: var(--c-soft-gray);
-    border-radius: 12px;
+    background: rgba(251, 228, 216, 0.4);
+    border-radius: 14px;
     padding: 16px 6px;
     text-align: center;
-    border: 1px solid rgba(18, 10, 22, 0.02);
+    border: 1px solid rgba(223, 182, 178, 0.2);
   }
 
   .act-title {
     font-size: 11px;
-    font-weight: 500;
-    color: var(--text-muted);
+    font-weight: 600;
+    color: var(--c-berry-accent);
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
@@ -313,7 +331,7 @@
     font-size: 18px;
     font-weight: 600;
     margin-top: 8px;
-    color: var(--text-dark);
+    color: var(--c-fine-dark);
   }
 
   .score-summary-inline {
@@ -325,9 +343,8 @@
     background: #FFFFFF;
     padding: 14px 18px;
     border-radius: 12px;
-    border: 1px solid rgba(197, 168, 128, 0.35);
-    color: var(--text-dark);
-    letter-spacing: 0.3px;
+    border: 1px solid var(--c-nude-soft);
+    color: var(--c-fine-dark);
   }
 
   .error-msg {
@@ -341,31 +358,32 @@
 
   .hidden { display: none !important; }
 
-  /* REPRODUCTOR DE AMBIENTE SINFÓNICO RELAJANTE */
+  /* REPRODUCTOR DE PIANO ACÚSTICO */
   .music-player {
     position: fixed;
     bottom: 35px;
     right: 35px;
     background: #ffffff;
-    border: 1px solid var(--c-gold-satin);
+    border: 1px solid var(--c-nude-soft);
     border-radius: 30px;
     padding: 12px 24px;
     display: flex;
     align-items: center;
     gap: 12px;
     font-size: 11px;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    box-shadow: 0 10px 30px rgba(18, 10, 22, 0.1);
+    box-shadow: 0 10px 30px rgba(82, 43, 91, 0.06);
     z-index: 100;
     cursor: pointer;
+    color: var(--c-fine-dark);
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
   
   .music-player:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 35px rgba(18, 10, 22, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(82, 43, 91, 0.12);
   }
 </style>
 </head>
@@ -378,7 +396,10 @@
 
 <div class="container-card">
 
-  <!-- ================= PANTALLA 1: LOG IN ================= -->
+  <div class="institution-logo-container">
+    <img src="WhatsApp Image 2026-02-18 at 5.01.18 PM.jpeg" alt="Logo Instituto Polivalente San Pedro de Tutule" class="institution-logo">
+  </div>
+
   <section id="panel-busqueda">
     <h2>Bienvenido</h2>
     <p class="subtitle">Ingrese las credenciales del estudiante para acceder al registro privado y exclusivo.</p>
@@ -390,17 +411,16 @@
     </div>
   </section>
 
-  <!-- ================= PANTALLA 2: BOLETA ALUMNO ================= -->
   <section id="panel-boleta" class="hidden">
     <h2 id="lbl-nombre" style="text-align: left; font-size: 28px;">Estudiante</h2>
     <p class="subtitle" id="lbl-identidad" style="text-align: left; margin-bottom: 30px;">ID: 0000000000000</p>
 
     <div class="profile-area">
       <div class="profile-circle" id="avatar-preview">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#120A16" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2B124C" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       </div>
       <div>
-        <span style="display:block; font-size:12px; font-weight:500; margin-bottom:6px; color: var(--text-dark); letter-spacing: 0.5px;">Fotografía de Registro</span>
+        <span style="display:block; font-size:12px; font-weight:600; margin-bottom:6px; color: var(--c-fine-dark); letter-spacing: 0.5px;">Fotografía de Registro</span>
         <label class="file-input-label">
           Actualizar Retrato
           <input type="file" id="photo-upload" accept="image/*" style="display: none;" onchange="previewImage(event)">
@@ -414,11 +434,10 @@
   </section>
 </div>
 
-<!-- REPRODUCTOR SUAVE ORQUESTAL (PIANO / CUERDAS REFINADO) -->
 <div class="music-player" onclick="toggleMusic()">
-  <span id="music-icon">🎻</span>
-  <span id="music-text">Fondo Sinfónico: Off</span>
-  <audio id="bg-audio" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+  <span id="music-icon">🎹</span>
+  <span id="music-text">Piano Acústico: Off</span>
+  <audio id="bg-audio" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"></audio>
 </div>
 
 <script>
@@ -428,7 +447,7 @@ function cargarBaseDatos() {
   fetch('notas_alumnos.json?t=' + new Date().getTime())
     .then(response => { if (!response.ok) throw new Error(); return response.json(); })
     .then(data => { NOTAS_ALUMNOS = data; })
-    .catch(err => { console.error("Error al enlazar la base de datos de élite."); });
+    .catch(err => { console.error("Error al enlazar los registros."); });
 }
 
 function buscarCalificaciones() {
@@ -505,7 +524,7 @@ function buscarCalificaciones() {
       blockParcial.innerHTML = `
         <div class="parcial-header">
           <span>Periodo ${p}</span>
-          <span style="font-family:'Inter',sans-serif; font-weight:600; font-size:13px; color: var(--c-gold-satin);">Evaluación: ${pData && pData.cursado ? pData.total + '%' : '-'}</span>
+          <span style="font-family:'Inter',sans-serif; font-weight:600; font-size:13px; color: var(--c-berry-accent);">Evaluación: ${pData && pData.cursado ? pData.total + '%' : '-'}</span>
         </div>
         <div class="grid-activities">${gridHtml}</div>
         <div class="score-summary-inline">
@@ -542,13 +561,13 @@ function toggleMusic() {
   const audio = document.getElementById('bg-audio');
   if(!musicPlaying) {
     audio.play().catch(() => {});
-    document.getElementById('music-text').innerText = "Fondo Sinfónico: On";
+    document.getElementById('music-text').innerText = "Piano Acústico: On";
     document.getElementById('music-icon').innerText = "⏸️";
     musicPlaying = true;
   } else {
     audio.pause();
-    document.getElementById('music-text').innerText = "Fondo Sinfónico: Off";
-    document.getElementById('music-icon').innerText = "🎻";
+    document.getElementById('music-text').innerText = "Piano Acústico: Off";
+    document.getElementById('music-icon').innerText = "🎹";
     musicPlaying = false;
   }
 }
