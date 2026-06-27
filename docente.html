@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Privado de la Docente Karla Castro</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght=700&family=Lato:wght=400;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* COLORES EXACTOS DEL PANEL DEL ALUMNO */
+  --canvas: #f4f7f6; 
+  --canvas2: #e9f0f2; 
+  --linen: #d1e2e3; 
+  --sage: #17b978;        /* Verde esmeralda */
+  --sage-dark: #1e3d59;   /* Azul profundo */
+  --sage-light: #438a5e;  /* Verde oliva sutil */
+  --text: #112233;        /* Azul casi negro */
+  --text-muted: #536162; 
+  --white: #FFFFFF;
+  --border: #e1e9eb; 
+  --border-dark: #b3c5c7; 
+  --pass: #17b978; 
+  --fail: #a64444;
+  --radius: 6px; --radius-sm: 4px; --shadow: 0 4px 16px rgba(30,61,89,.05);
+}
+body{ background: var(--canvas); font-family: 'Lato', sans-serif; color: var(--text); min-height: 100vh; }
+
+/* CABECERA CON ESPACIO DE LOGO E IDENTIDAD DEL ALUMNO */
+.site-header{ 
+  background: linear-gradient(135deg, var(--sage-dark) 0%, #295270 50%, var(--sage-light) 100%); 
+  padding: 30px 24px; 
+  text-align: center; 
+  color:#fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.logo-colegio { width: 60px; height: 60px; background: #fff; border-radius: 50%; padding: 4px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+.logo-colegio img { width: 100%; height: 100%; object-fit: contain; }
+.instituto-name{ font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; }
+
+main{ max-width: 1250px; margin: 0 auto; padding: 30px 20px; }
+.card{ background: var(--white); border: 1px solid var(--border-dark); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow); position: relative; }
+.card::after{ content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--sage); border-radius: var(--radius) var(--radius) 0 0; }
+.card-title{ font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--sage-dark); margin-bottom: 20px; }
+.row{ display:flex; flex-wrap:wrap; gap:14px; margin-bottom:14px; }
+.field{ display:flex; flex-direction:column; gap:5px; flex:1; min-width:150px; }
+.field label{ font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted); }
+input,select{ background: #ffffff; border: 1px solid var(--border-dark); border-radius: var(--radius-sm); padding: 10px 12px; color: var(--text); font-size: 14px; outline: none; }
+input:focus,select:focus{ border-color: var(--sage); }
+
+.btn{ padding: 11px 22px; border: 1px solid var(--sage-dark); border-radius: var(--radius-sm); font-size: 12px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: all .2s; }
+.btn-primary{ background: var(--sage-dark); color: #fff; border-color: var(--sage-dark); }
+.btn-primary:hover{ background: #152b3f; }
+.btn-secondary{ background: var(--sage); color: #fff; border-color: var(--sage); }
+.btn-secondary:hover{ background: #129e66; }
+.btn-danger{ background: #FFF0F0; color: var(--fail); border-color: var(--fail); }
+.btn-sm{ padding: 6px 12px; font-size: 11px; }
+
+.cursos-grid{ display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 15px; }
+.curso-chip{ background: var(--white); border: 1px solid var(--border-dark); border-radius: var(--radius-sm); padding: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 700; }
+.curso-chip.active-curso{ background: var(--sage-dark); color: #fff; border-color: var(--sage-dark); }
+
+.table-wrap{ overflow-x: auto; border: 1px solid var(--border-dark); border-radius: var(--radius-sm); margin-top: 15px; }
+table{ width:100%; border-collapse:collapse; font-size:13px; min-width:1050px; background: #FFF; }
+thead th{ background: var(--canvas2); color: var(--sage-dark); font-family: 'Playfair Display', serif; font-weight: 700; padding: 12px 6px; border-bottom: 2px solid var(--border-dark); }
+thead th input { background: #ffffff; border: 1px solid var(--border-dark); border-radius: 4px; padding: 4px; color: var(--sage-dark); text-align: center; font-weight: 700; width: 85px; }
+tbody td{ padding: 10px 6px; text-align:center; vertical-align: middle; }
+.grade-cell input{ width: 50px; padding: 6px 4px; text-align:center; border: 1px solid var(--border-dark); background: var(--canvas); }
+.final-cell{ font-weight: 800; font-size: 15px; background: #f0f9f5; color: var(--sage-dark); }
+.hidden{ display:none !important; }
+.sync-box { background: #ffffff; border: 1px solid var(--border-dark); padding: 15px; border-radius: var(--radius); display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 15px; flex-wrap: wrap; border-left: 4px solid var(--sage-dark); }
+
+/* ESPACIO CIRCULAR PARA LA FOTO DEL ALUMNO EN LA TABLA */
+.avatar-student-frame { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-dark); background: var(--canvas); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; }
+.avatar-student-frame img { width: 100%; height: 100%; object-fit: cover; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-colegio">
+    <img src="logo.png" alt="Logo" onerror="this.style.display='none'">
+  </div>
+  <div class="instituto-name">🔒 PANEL DE LA DOCENTE — KARLA CASTRO</div>
+  <div style="font-size:13px; opacity:0.9; margin-top:2px;">Control de Notas y Publicación Web Estudiantil</div>
+</header>
+
+<main>
+  <div class="sync-box">
+    <div>
+      <h4 style="color:var(--sage-dark); font-family:'Playfair Display', serif;">🌐 Publicación Estudiantil Desglosada</h4>
+      <p style="font-size:12px; color:var(--text-muted);">Genera el archivo con Acumulados, Exámenes, Totales por parcial y Promedio Anual incorporados.</p>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn btn-secondary" onclick="exportarParaAlumnos()" style="background:var(--sage-dark); border-color:var(--sage-dark);">📦 Generar Base de Datos para Alumnos</button>
+      <button class="btn" onclick="document.getElementById('import-file').click()" style="background:var(--sage); color:#fff; border:none;">📥 Importar Datos Anteriores</button>
+      <input type="file" id="import-file" class="hidden" accept=".json" onchange="importarDatos(this)">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🏫 Configuración de Curso y Aula</div>
+    <div class="row" style="align-items:flex-end;">
+      <div class="field">
+        <label>Año / Grado</label>
+        <select id="inp-grado">
+          <option value="">— Seleccionar —</option>
+          <option>7° Año</option><option>8° Año</option><option>9° Año</option>
+          <option>10° Año</option><option>11° Año</option>
+        </select>
+      </div>
+      <div class="field" style="max-width:120px;">
+        <label>Sección</label>
+        <select id="inp-seccion"><option>1</option><option>2</option><option>3</option><option>4</option></select>
+      </div>
+      <div class="field">
+        <label>Asignatura</label>
+        <input type="text" id="inp-curso-custom" placeholder="Ej: Matemáticas">
+      </div>
+      <button class="btn btn-primary" onclick="agregarCurso()">Crear Curso</button>
+    </div>
+    <div id="cursos-grid" class="cursos-grid"></div>
+  </div>
+
+  <div id="panel-libro" class="hidden">
+    <div class="card">
+      <div class="card-title" id="lbl-curso-actual">—</div>
+      
+      <div class="row" style="gap:8px; margin-bottom:15px;">
+        <button class="btn btn-sm" id="pbtn-I" onclick="setParcial('I')">I Parcial</button>
+        <button class="btn btn-sm" id="pbtn-II" onclick="setParcial('II')">II Parcial</button>
+        <button class="btn btn-sm" id="pbtn-III" onclick="setParcial('III')">III Parcial</button>
+        <button class="btn btn-sm" id="pbtn-IV" onclick="setParcial('IV')">IV Parcial</button>
+      </div>
+
+      <div class="row" style="align-items:flex-end; background:#FBFBF7; padding:12px; border-radius:4px; border:1px solid var(--border_dark);">
+        <div class="field" style="max-width:180px;"><label>Identidad (13 dígitos)</label><input type="text" id="inp-alu-id" maxlength="13"></div>
+        <div class="field"><label>Nombre del Alumno</label><input type="text" id="inp-alu-nombre" placeholder="Apellidos, Nombres"></div>
+        <div class="field" style="max-width:100px;">
+          <label>Género</label>
+          <select id="inp-alu-genero"><option value="F">Niña</option><option value="M">Niño</option></select>
+        </div>
+        <button class="btn btn-primary" onclick="agregarAlumno()">Inscribir</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead id="thead-notes"></thead>
+          <tbody id="tbody-notas"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+let DB = JSON.parse(localStorage.getItem('ips_esperanza_notas') || '{}');
+let activeCurso = null; let activeParcial = 'I';
+
+function save() { localStorage.setItem('ips_esperanza_notas', JSON.stringify(DB)); }
+
+function agregarCurso(nombreForzado = null){
+  if(nombreForzado) {
+    const key = nombreForzado.replace(/\s+/g,'_');
+    if(!DB[key]){
+      DB[key] = { nombre: nombreForzado, alumnos: [], actividadesNombres: { I:["Act. 1","Act. 2","Act. 3","Act. 4","Act. 5","Act. 6"], II:["Act. 1","Act. 2","Act. 3","Act. 4","Act. 5","Act. 6"], III:["Act. 1","Act. 2","Act. 3","Act. 4","Act. 5","Act. 6"], IV:["Act. 1","Act. 2","Act. 3","Act. 4","Act. 5","Act. 6"] }, parciales: { I:{notas:{}}, II:{notas:{}}, III:{notas:{}}, IV:{notas:{}} } };
+    }
+    return key;
+  }
+  const grado = document.getElementById('inp-grado').value;
+  const seccion = document.getElementById('inp-seccion').value;
+  const custom = document.getElementById('inp-curso-custom').value.trim();
+  if(!grado || !custom) return;
+  const key = (grado + '-' + seccion + '-' + custom).replace(/\s+/g,'_');
+  if(!DB[key]){
+    DB[key] = { nombre: `${grado} (Sec. ${seccion}) — ${custom}`, alumnos: [], actividadesNombres: { I:["Act. 1","Act. 2","Act. 3","Act. 4","Act. 5","Act. 6"], II:["Act. 1","Act. 2","Act. 3","Act. 4","Act. 5","Act. 6"], III:["Act. 1","Act. 2","Act. 3","Act. 4","Act. 5","Act. 6"], IV:["Act. 1","Act. 2","Act. 3","Act. 4","Act. 5","Act. 6"] }, parciales: { I:{notas:{}}, II:{notas:{}}, III:{notas:{}}, IV:{notas:{}} } };
+  }
+  save(); renderCursosGrid(); document.getElementById('inp-curso-custom').value = '';
+}
+
+function renderCursosGrid(){
+  const grid = document.getElementById('cursos-grid'); grid.innerHTML = '';
+  Object.keys(DB).forEach(key => {
+    const div = document.createElement('div'); div.className = 'curso-chip' + (key === activeCurso ? ' active-curso' : '');
+    div.innerHTML = `<span>${DB[key].nombre}</span> <span style="font-size:11px;">${DB[key].alumnos.length} alu.</span>`;
+    div.onclick = () => { activeCurso = key; document.getElementById('panel-libro').classList.remove('hidden'); document.getElementById('lbl-curso-actual').textContent = DB[key].nombre; setParcial(activeParcial); renderCursosGrid(); };
+    grid.appendChild(div);
+  });
+}
+
+function setParcial(p){ activeParcial = p; ['I','II','III','IV'].forEach(k => document.getElementById('pbtn-'+k).style.background = k===p?'var(--sage-dark)':'#FFF'); ['I','II','III','IV'].forEach(k => document.getElementById('pbtn-'+k).style.color = k===p?'#FFF':'var(--sage-dark)'); renderTabla(); }
+function cambiarNombreActividad(idx, val){ if(!activeCurso) return; DB[activeCurso].actividadesNombres[activeParcial][idx] = val; save(); }
+
+function agregarAlumno(){
+  const id = document.getElementById('inp-alu-id').value.trim(); const nombre = document.getElementById('inp-alu-nombre').value.trim(); const genero = document.getElementById('inp-alu-genero').value;
+  if(id.length !== 13 || !nombre) { alert('Identidad de 13 dígitos y nombre requeridos.'); return; }
+  if(DB[activeCurso].alumnos.find(a=>a.id===id)) return;
+  DB[activeCurso].alumnos.push({ id, nombre, genero }); save();
+  document.getElementById('inp-alu-id').value = ''; document.getElementById('inp-alu-nombre').value = ''; renderTabla();
+}
+
+function renderTabla(){
+  if(!activeCurso) return; const c = DB[activeCurso]; const p = c.parciales[activeParcial];
+  let th = `<tr><th>N°</th><th>Foto</th><th style="text-align:left; padding-left: 5px;">Identidad & Alumno</th>`;
+  for(let i=0;i<6;i++) th += `<th><input type="text" value="${c.actividadesNombres[activeParcial][i]}" onchange="cambiarNombreActividad(${i},this.value)"></th>`;
+  th += `<th>Acum /50</th><th>Examen /50</th><th>Nota Parcial</th><th>Acción</th></tr>`;
+  document.getElementById('thead-notes').innerHTML = th;
+
+  const tbody = document.getElementById('tbody-notas'); tbody.innerHTML = '';
+  c.alumnos.forEach((alu, idx) => {
+    if(!p.notas[alu.id]) p.notas[alu.id] = { act: Array(6).fill(''), examen: '' };
+    const n = p.notas[alu.id]; let acum = 0; n.act.forEach(v => acum += (parseFloat(v)||0));
+    const total = Math.round(acum + (parseFloat(n.examen)||0));
+    let tdActs = '';
+    for(let i=0;i<6;i++) tdActs += `<td><div class="grade-cell"><input type="number" step="0.1" value="${n.act[i]}" onchange="actCelda('${alu.id}','act',${i},this.value,null)"></div></td>`;
+    
+    // RENDERIZA LA FOTO DESDE LA BASE DE DATOS O DEJA SILUETA DE MANERA FIJA
+    let fotoHtml = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+    if (alu.foto && alu.foto.trim() !== "") {
+      fotoHtml = `<img src="${alu.foto}" alt="Foto">`;
+    }
+
+    let tr = document.createElement('tr');
+    tr.innerHTML = `<td>${idx+1}</td><td><div class="avatar-student-frame">${fotoHtml}</div></td><td style="text-align:left; padding-left: 5px;"><b>${alu.nombre}</b><br><small>${alu.id}</small></td>${tdActs}<td>${acum.toFixed(1)}</td><td><div class="grade-cell"><input type="number" value="${n.examen}" onchange="actCelda('${alu.id}','examen',null,this.value,50)"></div></td><td class="final-cell">${total}</td><td><button class="btn btn-danger btn-sm" onclick="eliminarAlu('${alu.id}')">✕</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function actCelda(id, tipo, idx, val, max){
+  let num = parseFloat(val); if(isNaN(num)||num<0) num=''; else if(max && num>max) num=max;
+  if(tipo==='act') DB[activeCurso].parciales[activeParcial].notas[id].act[idx] = num;
+  else DB[activeCurso].parciales[activeParcial].notas[id].examen = num;
+  save(); renderTabla();
+}
+
+function eliminarAlu(id){ if(confirm('¿Desvincular alumno?')){ DB[activeCurso].alumnos = DB[activeCurso].alumnos.filter(a=>a.id!==id); save(); renderTabla(); } }
+
+function exportarParaAlumnos() {
+  let output = {};
+  Object.keys(DB).forEach(cKey => {
+    const curso = DB[cKey];
+    curso.alumnos.forEach(alu => {
+      if (!output[alu.id]) {
+        output[alu.id] = { nombre: alu.nombre, genero: alu.genero, foto: alu.foto || '', asignaturas: {} };
+      }
+      
+      const parcialI = obtenerResumen(curso, 'I', alu.id);
+      const parcialII = obtenerResumen(curso, 'II', alu.id);
+      const parcialIII = obtenerResumen(curso, 'III', alu.id);
+      const parcialIV = obtenerResumen(curso, 'IV', alu.id);
+
+      let sumaTotales = 0;
+      let parcialesCursados = 0;
+
+      [parcialI, parcialII, parcialIII, parcialIV].forEach(p => {
+        if (p.cursado) {
+          sumaTotales += p.total;
+          parcialesCursados++;
+        }
+      });
+
+      const promedioAnual = parcialesCursados > 0 ? Math.round(sumaTotales / parcialesCursados) : 0;
+
+      output[alu.id].asignaturas[curso.nombre] = {
+        I: parcialI,
+        II: parcialII,
+        III: parcialIII,
+        IV: parcialIV,
+        promedioAnual: parcialesCursados > 0 ? promedioAnual : '-'
+      };
+    });
+  });
+
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(output));
+  const dlAnchorElem = document.createElement('a');
+  dlAnchorElem.setAttribute("href", dataStr);
+  dlAnchorElem.setAttribute("download", "notas_alumnos.json");
+  dlAnchorElem.click();
+}
+
+function obtenerResumen(curso, pKey, aluId) {
+  const pData = curso.parciales[pKey];
+  const n = pData.notas[aluId] || { act: Array(6).fill(''), examen: '' };
+  let acum = 0; n.act.forEach(v => acum += (parseFloat(v) || 0));
+  let examen = parseFloat(n.examen) || 0;
+  const cursado = n.act.some(v => v !== '') || n.examen !== '';
+  
+  const nombresDeEsteParcial = curso.actividadesNombres && curso.actividadesNombres[pKey] 
+    ? curso.actividadesNombres[pKey] 
+    : ["Act. 1", "Act. 2", "Act. 3", "Act. 4", "Act. 5", "Act. 6"];
+
+  return { 
+    act: n.act,
+    nombresAct: nombresDeEsteParcial, 
+    acum: parseFloat(acum.toFixed(1)), 
+    examen: examen, 
+    total: Math.round(acum + examen), 
+    cursado: cursado 
+  };
+}
+
+function importarDatos(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const datosCargados = JSON.parse(e.target.result);
+      if (!datosCargados || Object.keys(datosCargados).length === 0) return;
+
+      const primerasLlaves = Object.keys(datosCargados);
+      const esArchivoAlumno = datosCargados[primerasLlaves[0]].asignaturas !== undefined;
+
+      if (esArchivoAlumno) {
+        DB = {}; 
+        Object.keys(datosCargados).forEach(idAlu => {
+          const aluData = datosCargados[idAlu];
+          Object.keys(aluData.asignaturas).forEach(materiaNombre => {
+            const cKey = agregarCurso(materiaNombre);
+            if (!DB[cKey].alumnos.find(a => a.id === idAlu)) {
+              DB[cKey].alumnos.push({ id: idAlu, nombre: aluData.nombre, genero: aluData.genero || 'F', foto: aluData.foto || '' });
+            }
+            ['I','II','III','IV'].forEach(pKey => {
+              const parcialInfo = aluData.asignaturas[materiaNombre][pKey];
+              if (parcialInfo && parcialInfo.cursado) {
+                DB[cKey].parciales[pKey].notas[idAlu] = {
+                  act: parcialInfo.act || [parcialInfo.acum, '', '', '', '', ''],
+                  examen: parcialInfo.examen !== 0 || parcialInfo.acum !== 0 ? parcialInfo.examen : ''
+                };
+                if(parcialInfo.nombresAct) {
+                  DB[cKey].actividadesNombres[pKey] = parcialInfo.nombresAct;
+                }
+              }
+            });
+          });
+        });
+        save(); renderCursosGrid();
+        alert("¡Base de datos reconstruida con éxito!");
+      } else {
+        DB = datosCargados;
+        save(); renderCursosGrid();
+        alert("¡Registros sincronizados con éxito!");
+      }
+    } catch (err) { 
+      alert("Error al procesar el archivo."); 
+    }
+  };
+  reader.readAsText(file);
+}
+
+window.onload = function(){ renderCursosGrid(); };
+</script>
+</body>
+</html>
