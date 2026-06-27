@@ -4,18 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Portal de Calificaciones Oficial · Instituto Polivalente San Pedro de Tutule</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    /* Paleta cromática exacta de image_396b7b.png */
-    --c-dark-1: #190019;
-    --c-purple-2: #2B124C;
-    --c-plum-3: #522B5B;
-    --c-berry-4: #854F6C;
-    --c-nude-5: #DFB6B2;
-    --c-cream-6: #FBE4D8;
+    /* Paleta de Lujo Silencioso y Exclusividad (Rebajando el morado) */
+    --c-space-dark: #120A16; /* Uva ultra oscuro casi negro */
+    --c-deep-wine: #26172B;  /* Vino/Uva profundo de fondo */
+    --c-velvet: #422D47;     /* Toque sutil de terciopelo atenuado */
+    --c-gold-satin: #C5A880; /* Dorado champán/satinado elegante */
+    --c-silk-cream: #FDFBF7; /* Crema de seda de alta costura */
+    --c-soft-gray: #F4EFF6;  /* Gris claro suavizado con matiz uva */
     
-    --text-primary: #190019;
+    --text-dark: #120A16;
+    --text-muted: #5A4E5E;
   }
 
   *, *::before, *::after { 
@@ -25,160 +26,174 @@
   }
 
   body {
-    font-family: 'Montserrat', sans-serif;
-    /* Recreación exacta del entorno degradado de la imagen */
-    background: radial-gradient(circle at center, var(--c-berry-4) 0%, var(--c-plum-3) 40%, var(--c-purple-2) 75%, var(--c-dark-1) 100%);
+    font-family: 'Inter', sans-serif;
+    /* Degradado liso de alta gama, sutil y opulento */
+    background: linear-gradient(135deg, var(--c-deep-wine) 0%, var(--c-space-dark) 100%);
     background-attachment: fixed;
-    color: var(--text-primary);
+    color: var(--text-dark);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    padding: 50px 20px;
+    padding: 60px 20px;
     position: relative;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
   }
 
   header {
     text-align: center;
-    margin-bottom: 50px;
+    margin-bottom: 60px;
     z-index: 10;
   }
 
-  /* Nombre del Colegio: El elemento más grande, majestuoso e imponente */
+  /* Nombre de la Institución: Sofisticado, elegante y de élite */
   .inst-title {
-    font-family: 'Cinzel', serif;
-    font-size: 32px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    color: var(--c-cream-6);
-    line-height: 1.2;
-    text-shadow: 0 4px 20px rgba(25, 0, 25, 0.85);
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--c-silk-cream);
+    line-height: 1.3;
     max-width: 800px;
     margin: 0 auto;
   }
 
   .docente-name {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--c-nude-5);
-    margin-top: 15px;
-    letter-spacing: 5px;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--c-gold-satin);
+    margin-top: 12px;
+    letter-spacing: 3px;
   }
 
-  /* PANEL PRINCIPAL REALISTA DE ALTA INGENIERÍA */
+  /* PANEL PRINCIPAL: Minimalismo exclusivo de alta costura */
   .container-card {
-    background: var(--c-cream-6);
-    border: 3px solid var(--c-dark-1);
-    border-radius: 40px; 
-    max-width: 540px;
+    background: var(--c-silk-cream);
+    border: 1px solid rgba(197, 168, 128, 0.3);
+    border-radius: 32px; 
+    max-width: 560px;
     width: 100%;
-    margin: 0 auto 50px auto;
-    padding: 55px 40px;
+    margin: 0 auto 60px auto;
+    padding: 60px 45px;
     position: relative;
     z-index: 5;
     box-shadow: 
-      0 30px 80px rgba(25, 0, 25, 0.65),
-      inset 0 2px 0px rgba(255, 255, 255, 0.8);
+      0 40px 90px rgba(18, 10, 22, 0.6),
+      inset 0 1px 1px rgba(255, 255, 255, 0.9);
   }
 
   h2 {
-    font-family: 'Cinzel', serif;
-    font-size: 36px;
-    font-weight: 800;
-    margin-bottom: 15px;
+    font-family: 'Playfair Display', serif;
+    font-size: 34px;
+    font-weight: 400;
+    margin-bottom: 12px;
     text-align: center;
-    letter-spacing: 2px;
-    color: var(--c-dark-1);
+    letter-spacing: -0.5px;
+    color: var(--text-dark);
   }
 
   .subtitle {
-    font-size: 13px;
-    color: var(--c-berry-4);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-style: italic;
+    color: var(--text-muted);
     text-align: center;
-    margin-bottom: 45px;
-    letter-spacing: 0.5px;
-    font-weight: 600;
-    line-height: 1.6;
+    margin-bottom: 50px;
+    line-height: 1.5;
   }
 
   .search-box {
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 30px;
   }
 
   input[type="text"] {
     width: 100%;
     border: none;
-    border-bottom: 3px solid var(--c-dark-1);
+    border-bottom: 1px solid rgba(18, 10, 22, 0.2);
     background: transparent;
-    padding: 12px 0;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 20px;
-    color: var(--c-dark-1);
+    padding: 15px 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 22px;
+    color: var(--text-dark);
     outline: none;
-    font-weight: 800;
+    font-weight: 300;
     text-align: center;
-    letter-spacing: 4px;
+    letter-spacing: 6px;
+    transition: border-color 0.3s;
   }
 
+  input[type="text"]:focus {
+    border-bottom: 1px solid var(--c-gold-satin);
+  }
+
+  /* Botón de Estilo Atelier Exclusivo */
   .btn-submit {
     display: block;
     width: 100%;
-    background: linear-gradient(135deg, var(--c-purple-2) 0%, var(--c-plum-3) 100%);
-    color: var(--c-cream-6);
-    border: 3px solid var(--c-dark-1);
-    padding: 18px;
-    border-radius: 50px;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 800;
-    font-size: 14px;
+    background: var(--c-space-dark);
+    color: var(--c-silk-cream);
+    border: 1px solid var(--c-gold-satin);
+    padding: 20px;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
     letter-spacing: 3px;
     cursor: pointer;
     margin-top: 15px;
-    transition: all 0.15s ease;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     text-align: center;
     text-transform: uppercase;
-    box-shadow: 0 6px 0px var(--c-dark-1);
+  }
+
+  .btn-submit:hover {
+    background: var(--c-deep-wine);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(18, 10, 22, 0.25);
   }
 
   .btn-submit:active {
-    transform: translateY(6px);
-    box-shadow: 0 0px 0px var(--c-dark-1);
+    transform: translateY(0);
   }
 
   .btn-logout {
     background: transparent;
-    color: var(--c-dark-1);
+    color: var(--text-dark);
     font-size: 11px;
-    padding: 10px;
-    margin-top: 40px;
+    padding: 12px;
+    margin-top: 50px;
+    border: 1px solid rgba(18, 10, 22, 0.15);
+    border-radius: 8px;
+  }
+  
+  .btn-logout:hover {
+    background: rgba(18, 10, 22, 0.02);
     box-shadow: none;
-    border: 2px solid rgba(25, 0, 25, 0.3);
+    transform: none;
   }
 
   .profile-area {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 25px;
     background: #FFFFFF;
-    padding: 18px;
-    border-radius: 24px;
-    border: 3px solid var(--c-dark-1);
-    margin-bottom: 40px;
-    box-shadow: inset 0 3px 6px rgba(0,0,0,0.08);
+    padding: 20px;
+    border-radius: 20px;
+    border: 1px solid rgba(18, 10, 22, 0.06);
+    margin-bottom: 45px;
+    box-shadow: 0 10px 30px rgba(18, 10, 22, 0.02);
   }
 
   .profile-circle {
-    width: 80px;
-    height: 80px;
+    width: 76px;
+    height: 76px;
     border-radius: 50%;
-    border: 3px solid var(--c-dark-1);
-    background: var(--c-nude-5);
+    border: 1px solid var(--c-gold-satin);
+    background: var(--c-soft-gray);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -193,159 +208,164 @@
 
   .file-input-label {
     font-size: 11px;
-    background: var(--c-dark-1);
-    color: #FFFFFF;
-    padding: 10px 20px;
-    border-radius: 30px;
+    background: var(--c-space-dark);
+    color: var(--c-silk-cream);
+    padding: 10px 22px;
+    border-radius: 6px;
     cursor: pointer;
-    font-weight: 800;
-    letter-spacing: 1px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
+    border: 1px solid var(--c-gold-satin);
+    transition: background 0.2s;
+  }
+
+  .file-input-label:hover {
+    background: var(--c-velvet);
   }
 
   .materia-title {
-    font-family: 'Cinzel', serif;
-    font-size: 22px;
-    font-weight: 800;
-    margin-top: 50px;
-    margin-bottom: 25px;
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 400;
+    margin-top: 60px;
+    margin-bottom: 35px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 3px solid var(--c-dark-1);
-    padding-bottom: 12px;
-    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(18, 10, 22, 0.1);
+    padding-bottom: 15px;
+    letter-spacing: -0.2px;
   }
 
   .promedio-badge {
-    font-family: 'Montserrat', sans-serif; 
-    font-size: 13px; 
-    font-weight: 800; 
-    background: var(--c-dark-1); 
-    color: var(--c-cream-6);
-    padding: 6px 16px; 
-    border-radius: 24px;
+    font-family: 'Inter', sans-serif; 
+    font-size: 12px; 
+    font-weight: 600; 
+    background: var(--c-soft-gray); 
+    color: var(--text-dark);
+    padding: 8px 18px; 
+    border-radius: 30px;
+    border: 1px solid rgba(18, 10, 22, 0.05);
+    letter-spacing: 0.5px;
   }
 
-  /* ARQUITECTURA DE PANEL PARCIAL EN 3D REAL */
+  /* BLOQUES PARCIALES EFECTO FLOTANTE INGRÁVIDO */
   .parcial-block {
-    border: 3px solid var(--c-dark-1);
-    border-radius: 24px;
-    padding: 24px;
-    margin-bottom: 45px;
+    border: 1px solid rgba(18, 10, 22, 0.04);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 40px;
     background: #FFFFFF;
     position: relative;
-    transition: transform 0.2s ease;
+    /* Efecto de flotación premium mediante sombras suaves multicapa */
     box-shadow: 
-      0px 1px 0px var(--c-nude-5),
-      0px 2px 0px var(--c-berry-4),
-      0px 4px 0px var(--c-plum-3),
-      0px 6px 0px var(--c-dark-1),
-      0px 15px 25px rgba(25, 0, 25, 0.15);
+      0 15px 35px rgba(27, 22, 30, 0.06),
+      0 5px 15px rgba(0, 0, 0, 0.02);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .parcial-block:hover {
-    transform: translateY(-2px);
+    /* Al pasar el cursor incrementa su altura de flotación de forma sofisticada */
+    transform: translateY(-8px);
     box-shadow: 
-      0px 1px 0px var(--c-nude-5),
-      0px 3px 0px var(--c-berry-4),
-      0px 5px 0px var(--c-plum-3),
-      0px 8px 0px var(--c-dark-1),
-      0px 20px 30px rgba(25, 0, 25, 0.2);
+      0 30px 60px rgba(27, 22, 30, 0.12),
+      0 10px 20px rgba(0, 0, 0, 0.03);
   }
 
   .parcial-header {
-    font-family: 'Cinzel', serif;
+    font-family: 'Playfair Display', serif;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-weight: 800;
-    font-size: 18px;
-    color: var(--c-dark-1);
-    border-bottom: 2px solid rgba(25, 0, 25, 0.1);
-    padding-bottom: 10px;
+    font-weight: 400;
+    font-size: 19px;
+    color: var(--text-dark);
+    border-bottom: 1px solid rgba(18, 10, 22, 0.06);
+    padding-bottom: 12px;
   }
 
   .grid-activities {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-top: 20px;
+    gap: 14px;
+    margin-top: 25px;
   }
 
   .act-box {
-    background: var(--c-cream-6);
-    border: 2px solid var(--c-dark-1);
-    border-radius: 14px;
-    padding: 14px 4px;
+    background: var(--c-soft-gray);
+    border-radius: 12px;
+    padding: 16px 6px;
     text-align: center;
-    box-shadow: inset 0 2px 4px rgba(25, 0, 25, 0.05);
+    border: 1px solid rgba(18, 10, 22, 0.02);
   }
 
   .act-title {
     font-size: 11px;
-    font-weight: 800;
-    color: var(--c-berry-4);
+    font-weight: 500;
+    color: var(--text-muted);
     text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
   .act-score {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 17px;
-    font-weight: 800;
-    margin-top: 6px;
-    color: var(--c-dark-1);
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 8px;
+    color: var(--text-dark);
   }
 
   .score-summary-inline {
     display: flex;
     justify-content: space-between;
     font-size: 12px;
-    font-weight: 800;
-    margin-top: 20px;
-    background: var(--c-nude-5);
-    padding: 12px 16px;
-    border-radius: 14px;
-    border: 2px solid var(--c-dark-1);
-    color: var(--c-dark-1);
+    font-weight: 500;
+    margin-top: 25px;
+    background: #FFFFFF;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 1px solid rgba(197, 168, 128, 0.35);
+    color: var(--text-dark);
+    letter-spacing: 0.3px;
   }
 
   .error-msg {
-    color: #901A1A;
-    font-size: 14px;
+    color: #A34343;
+    font-size: 13px;
     margin-top: 15px;
     text-align: center;
-    font-weight: 700;
+    font-weight: 500;
     display: none;
   }
 
   .hidden { display: none !important; }
 
-  /* REPRODUCTOR ESTILO RED CIRCLE (JOHN WICK) */
+  /* REPRODUCTOR DE AMBIENTE SINFÓNICO RELAJANTE */
   .music-player {
     position: fixed;
-    bottom: 30px;
-    right: 30px;
+    bottom: 35px;
+    right: 35px;
     background: #ffffff;
-    border: 3px solid var(--c-dark-1);
-    border-radius: 50px;
+    border: 1px solid var(--c-gold-satin);
+    border-radius: 30px;
     padding: 12px 24px;
     display: flex;
     align-items: center;
     gap: 12px;
     font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 2px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
-    box-shadow: 0 5px 0px var(--c-dark-1);
+    box-shadow: 0 10px 30px rgba(18, 10, 22, 0.1);
     z-index: 100;
     cursor: pointer;
-    transition: all 0.1s;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
   
-  .music-player:active {
-    transform: translateY(5px);
-    box-shadow: 0 0px 0px var(--c-dark-1);
+  .music-player:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px rgba(18, 10, 22, 0.15);
   }
 </style>
 </head>
@@ -360,29 +380,29 @@
 
   <!-- ================= PANTALLA 1: LOG IN ================= -->
   <section id="panel-busqueda">
-    <h2>Welcome</h2>
-    <p class="subtitle">Ingresa el número de identidad para desplegar el expediente académico tridimensional.</p>
+    <h2>Bienvenido</h2>
+    <p class="subtitle">Ingrese las credenciales del estudiante para acceder al registro privado y exclusivo.</p>
 
     <div class="search-box">
       <input type="text" id="txt-identidad" placeholder="0801199012345" maxlength="13">
-      <button class="btn-submit" onclick="buscarCalificaciones()">Acceder al Sistema</button>
+      <button class="btn-submit" onclick="buscarCalificaciones()">Acceder al Portal</button>
       <div id="error-box" class="error-msg"></div>
     </div>
   </section>
 
   <!-- ================= PANTALLA 2: BOLETA ALUMNO ================= -->
   <section id="panel-boleta" class="hidden">
-    <h2 id="lbl-nombre" style="text-align: left; font-size: 26px;">Estudiante</h2>
-    <p class="subtitle" id="lbl-identidad" style="text-align: left; margin-bottom: 25px;">ID: 0000000000000</p>
+    <h2 id="lbl-nombre" style="text-align: left; font-size: 28px;">Estudiante</h2>
+    <p class="subtitle" id="lbl-identidad" style="text-align: left; margin-bottom: 30px;">ID: 0000000000000</p>
 
     <div class="profile-area">
       <div class="profile-circle" id="avatar-preview">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#190019" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#120A16" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       </div>
       <div>
-        <span style="display:block; font-size:12px; font-weight:800; margin-bottom:6px; color: var(--c-dark-1);">Registro Fotográfico</span>
+        <span style="display:block; font-size:12px; font-weight:500; margin-bottom:6px; color: var(--text-dark); letter-spacing: 0.5px;">Fotografía de Registro</span>
         <label class="file-input-label">
-          Subir Archivo
+          Actualizar Retrato
           <input type="file" id="photo-upload" accept="image/*" style="display: none;" onchange="previewImage(event)">
         </label>
       </div>
@@ -390,15 +410,15 @@
 
     <div id="materias-container"></div>
 
-    <button class="btn-submit btn-logout" onclick="salirSistema()">Cerrar Sesión Activa</button>
+    <button class="btn-submit btn-logout" onclick="salirSistema()">Finalizar Consulta Privada</button>
   </section>
 </div>
 
-<!-- CONTROL DE AUDIO ESTILO JOHN WICK: "THE RED CIRCLE" CLUB INSTRUMENTAL -->
+<!-- REPRODUCTOR SUAVE ORQUESTAL (PIANO / CUERDAS REFINADO) -->
 <div class="music-player" onclick="toggleMusic()">
-  <span id="music-icon">🔥</span>
-  <span id="music-text">Red Circle Mix: Off</span>
-  <audio id="bg-audio" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"></audio>
+  <span id="music-icon">🎻</span>
+  <span id="music-text">Fondo Sinfónico: Off</span>
+  <audio id="bg-audio" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
 </div>
 
 <script>
@@ -408,7 +428,7 @@ function cargarBaseDatos() {
   fetch('notas_alumnos.json?t=' + new Date().getTime())
     .then(response => { if (!response.ok) throw new Error(); return response.json(); })
     .then(data => { NOTAS_ALUMNOS = data; })
-    .catch(err => { console.error("Error de sincronización."); });
+    .catch(err => { console.error("Error al enlazar la base de datos de élite."); });
 }
 
 function buscarCalificaciones() {
@@ -417,26 +437,26 @@ function buscarCalificaciones() {
   errorBox.style.display = 'none';
 
   if (idBusqueda.length !== 13) {
-    errorBox.textContent = "Error: El número de identidad debe contener exactamente 13 dígitos.";
+    errorBox.textContent = "El número de identidad debe contener exactamente 13 dígitos del registro oficial.";
     errorBox.style.display = 'block';
     return;
   }
 
   if (!NOTAS_ALUMNOS) {
-    errorBox.textContent = "Error del servidor: Base de datos no enlazada.";
+    errorBox.textContent = "Error de enlace seguro con el servidor central.";
     errorBox.style.display = 'block';
     return;
   }
 
   const alumno = NOTAS_ALUMNOS[idBusqueda];
   if (!alumno) {
-    errorBox.textContent = "No se encontró ningún expediente asociado a esa identidad.";
+    errorBox.textContent = "No se localizó ningún expediente exclusivo asignado a este número de identidad.";
     errorBox.style.display = 'block';
     return;
   }
 
   document.getElementById('lbl-nombre').textContent = alumno.nombre;
-  document.getElementById('lbl-identidad').textContent = "Identidad: " + idBusqueda;
+  document.getElementById('lbl-identidad').textContent = "Expediente Oficial ID: " + idBusqueda;
 
   const container = document.getElementById('materias-container');
   container.innerHTML = '';
@@ -447,8 +467,8 @@ function buscarCalificaciones() {
     
     divMateria.innerHTML = `
       <div class="materia-title">
-        <span>#{ ${materia.replace(/_/g, ' ').toUpperCase()} }</span>
-        <span class="promedio-badge">PROMEDIO: ${notas.promedioAnual}%</span>
+        <span>${materia.replace(/_/g, ' ').toUpperCase()}</span>
+        <span class="promedio-badge">Rendimiento Anual: ${notas.promedioAnual}%</span>
       </div>
       <div class="parciales-list"></div>
     `;
@@ -467,7 +487,7 @@ function buscarCalificaciones() {
       blockParcial.className = 'parcial-block';
       
       if (!(pData && pData.cursado)) {
-        blockParcial.style.opacity = "0.3";
+        blockParcial.style.opacity = "0.35";
       }
 
       let gridHtml = '';
@@ -484,13 +504,13 @@ function buscarCalificaciones() {
 
       blockParcial.innerHTML = `
         <div class="parcial-header">
-          <span>${p} PARCIAL</span>
-          <span style="font-family:'Montserrat',sans-serif; font-weight:800; font-size:13px;">NOTA: ${pData && pData.cursado ? pData.total + '%' : '-'}</span>
+          <span>Periodo ${p}</span>
+          <span style="font-family:'Inter',sans-serif; font-weight:600; font-size:13px; color: var(--c-gold-satin);">Evaluación: ${pData && pData.cursado ? pData.total + '%' : '-'}</span>
         </div>
         <div class="grid-activities">${gridHtml}</div>
         <div class="score-summary-inline">
-          <span>Acumulado: ${pData && pData.cursado ? pData.acum.toFixed(1) : '-'} / 50</span>
-          <span>Examen: ${pData && pData.cursado ? pData.examen : '-'} / 50</span>
+          <span>Bloque Acumulativo: ${pData && pData.cursado ? pData.acum.toFixed(1) : '-'} / 50</span>
+          <span>Examen de Periodo: ${pData && pData.cursado ? pData.examen : '-'} / 50</span>
         </div>
       `;
       parcialesList.appendChild(blockParcial);
@@ -522,13 +542,13 @@ function toggleMusic() {
   const audio = document.getElementById('bg-audio');
   if(!musicPlaying) {
     audio.play().catch(() => {});
-    document.getElementById('music-text').innerText = "Red Circle Mix: On";
+    document.getElementById('music-text').innerText = "Fondo Sinfónico: On";
     document.getElementById('music-icon').innerText = "⏸️";
     musicPlaying = true;
   } else {
     audio.pause();
-    document.getElementById('music-text').innerText = "Red Circle Mix: Off";
-    document.getElementById('music-icon').innerText = "🔥";
+    document.getElementById('music-text').innerText = "Fondo Sinfónico: Off";
+    document.getElementById('music-icon').innerText = "🎻";
     musicPlaying = false;
   }
 }
