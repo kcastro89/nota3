@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Panel Docente - Karla Castro</title>
+<style>
+    /* Estilo básico de emergencia para verificar carga */
+    body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
+    .debug-box { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+</style>
+</head>
+<body>
+    <div class="debug-box" id="app">
+        <h2>Panel de Control</h2>
+        <p id="status">Cargando sistema...</p>
+    </div>
+
+<script>
+    // Inicialización segura
+    try {
+        let DB = JSON.parse(localStorage.getItem('ips_esperanza_notas') || '{}');
+        document.getElementById('status').innerText = "Sistema cargado correctamente. Cursos detectados: " + Object.keys(DB).length;
+        console.log("Datos cargados:", DB);
+    } catch (e) {
+        console.error("Error en datos:", e);
+        localStorage.removeItem('ips_esperanza_notas');
+        document.getElementById('status').innerText = "Se detectó un error en la base de datos y se ha reiniciado.";
+        location.reload();
+    }
+</script>
+</body>
+</html>
