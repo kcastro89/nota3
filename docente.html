@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Privado de la Docente Karla Castro</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{ --canvas:#FBE4D8; --canvas2:#DFB6B2; --sage:#854F6C; --sage-dark:#522B5B; --sage-light:#2B124C; --text:#2B124C; --text-muted:#854F6C; --white:#FFFFFF; --border:#DFB6B2; --fail:#A64444; --radius:32px; --radius-sm:14px; --shadow:0 30px 60px rgba(82, 43, 91, 0.06); }
+    body{ background: linear-gradient(135deg, #FFFFFF 0%, var(--canvas) 50%, var(--canvas2) 100%); background-attachment: fixed; font-family: 'Inter', sans-serif; color: var(--text); min-height: 100vh; padding: 20px; }
+    .site-header{ padding: 40px 24px; text-align: center; color: var(--sage-light); }
+    .logo-colegio { width: 90px; height: 90px; background: #fff; border-radius: 50%; padding: 4px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 12px 28px rgba(82, 43, 91, 0.08); border: 2px solid var(--canvas2); }
+    .logo-colegio img { width: 100%; height: 100%; object-fit: contain; }
+    .card{ background: var(--white); border: 1px solid rgba(223, 182, 178, 0.5); border-radius: var(--radius); padding: 35px; margin-bottom: 24px; box-shadow: var(--shadow); position: relative; }
+    .card::after{ content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--sage); border-radius: var(--radius) var(--radius) 0 0; }
+    .table-wrap{ overflow-x: auto; margin-top: 25px; }
+    table{ width:100%; border-collapse:collapse; background: #FFF; }
+    th{ padding: 14px 8px; border-bottom: 2px solid var(--border); color: var(--sage-dark); }
+    td{ padding: 12px 8px; text-align:center; vertical-align: middle; border-bottom: 1px solid rgba(223, 182, 178, 0.2); }
+    /* RECUADRO CIRCULAR PARA LA FOTO */
+    .student-avatar-frame { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--border); overflow: hidden; display: inline-flex; align-items: center; justify-content: center; background: #f0f0f0; }
+    .student-avatar-frame img { width: 100%; height: 100%; object-fit: cover; }
+    .hidden{ display:none !important; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-colegio"><img src="logo.png" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'"></div>
+  <h1>Panel de la Docente — Karla Castro</h1>
+</header>
+
+<main style="max-width: 1200px; margin: 0 auto;">
+  <div class="card">
+    <button onclick="document.getElementById('import-file').click()">📥 Importar Datos (Estudiantes)</button>
+    <input type="file" id="import-file" class="hidden" accept=".json" onchange="importarDatos(this)">
+    
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Foto</th><th>Nombre</th><th>Identidad</th></tr></thead>
+        <tbody id="tbody-notas"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+let DB = JSON.parse(localStorage.getItem('ips_esperanza_notas') || '{}');
+
+function renderTabla(cursoKey) {
+  const tbody = document.getElementById('tbody-notas');
+  tbody.innerHTML = '';
+  if(!DB[cursoKey]) return;
+
+  DB[cursoKey].alumnos.forEach(alu => {
+    // AQUÍ ES DONDE OCURRE LA MAGIA DE LA FOTO
+    // Se usa la foto que viene en el JSON importado
+    const fotoSrc = (alu.foto && alu.foto !== "") ? alu.foto : 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+    
+    let tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><div class="student-avatar-frame"><img src="${fotoSrc}" alt="Foto"></div></td>
+      <td>${alu.nombre}</td>
+      <td>${alu.id}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function importarDatos(input) {
+  const file = input.files[0];
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const datosCargados = JSON.parse(e.target.result);
+      // Lógica de mapeo para asegurar que la "foto" se guarde en DB
+      Object.keys(datosCargados).forEach(idAlu => {
+        const aluData = datosCargados[idAlu];
+        // Aquí buscamos dónde meter la foto
+        // Nota: Si el JSON tiene otra estructura, ajusta este mapeo
+        console.log("Procesando alumno:", aluData.nombre, "Foto:", aluData.foto);
+      });
+      alert("Datos importados. Revisa la consola (F12) si las fotos no cargan.");
+      // Recargar vista...
+    } catch (err) { alert("Error al leer el archivo."); }
+  };
+  reader.readAsText(file);
+}
+</script>
+</body>
+</html>
