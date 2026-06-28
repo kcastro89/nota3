@@ -255,14 +255,14 @@ tbody td{ padding: 12px 8px; text-align:center; vertical-align: middle; }
       }
     });
 
-    database.ref('notas_publicadas').set(output).then(() => {
+database.ref('notas_publicadas').set(output).then(() => {
       alert("¡Calificaciones subidas a la nube con éxito! Tus alumnos ya pueden revisarlas.");
+      // ESTA LÍNEA DE ABAJO ES LA QUE HACE QUE VUELVAN A APARECER TUS SECCIONES:
+      renderCursosGrid(); 
     }).catch((err) => {
       console.error(err);
       alert("Error al conectar con la base de datos.");
     });
-  }
-
   function importarDatos(input) {
     const file = input.files[0]; if (!file) return;
     const reader = new FileReader();
