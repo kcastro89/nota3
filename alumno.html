@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal del Estudiante — IPS San Pedro de Tutule</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{ --canvas: #FBE4D8; --canvas2: #DFB6B2; --sage: #854F6C; --sage-dark: #522B5B; --sage-light: #2B124C; --text: #2B124C; --text-muted: #854F6C; --white: #FFFFFF; --border: #DFB6B2; --radius: 32px; --radius-sm: 14px; --shadow: 0 30px 60px rgba(82, 43, 91, 0.06); }
+  body{ background: linear-gradient(135deg, #FFFFFF 0%, var(--canvas) 50%, var(--canvas2) 100%); background-attachment: fixed; font-family: 'Inter', sans-serif; color: var(--text); min-height: 100vh; padding: 20px; }
+  .container { max-width: 800px; margin: 0 auto; }
+  .header { text-align: center; padding: 30px 0; }
+  .instituto-title { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--sage-light); font-weight: 700; }
+  .card { background: var(--white); border: 1px solid rgba(223, 182, 178, 0.5); border-radius: var(--radius); padding: 30px; margin-bottom: 24px; box-shadow: var(--shadow); position: relative; }
+  .card::after{ content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--sage); border-radius: var(--radius) var(--radius) 0 0; }
+  .profile-section { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 25px; }
+  .avatar-frame { width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--border); overflow: hidden; background: #FFF; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 16px rgba(82, 43, 91, 0.1); position: relative; cursor: pointer; }
+  .avatar-frame img { width: 100%; height: 100%; object-fit: cover; }
+  .avatar-frame .upload-overlay { position: absolute; bottom: 0; background: rgba(82, 43, 91, 0.7); width: 100%; text-align: center; color: white; font-size: 10px; padding: 4px 0; font-weight: bold; }
+  .input-group { display: flex; gap: 10px; margin-top: 15px; }
+  input { flex: 1; padding: 12px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); outline: none; font-size: 14px; }
+  input:focus { border-color: var(--sage); }
+  .btn { padding: 12px 24px; border: none; background: var(--sage-dark); color: white; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+  .btn:hover { background: var(--sage-light); }
+  .table-wrap { overflow-x: auto; margin-top: 20px; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; background: white; font-size: 13px; }
+  th { background: var(--canvas); padding: 12px; color: var(--sage-dark); font-family: 'Playfair Display', serif; }
+  td { padding: 12px; text-align: center; border-bottom: 1px solid rgba(223, 182, 178, 0.2); }
+  .hidden { display: none !important; }
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <header class="header">
+    <h1 class="instituto-title">Instituto Polivalente San Pedro de Tutule</h1>
+    <p style="font-size: 13px; color: var(--sage); font-style: italic; margin-top: 5px;">Portal de Consulta Estudiantil</p>
+  </header>
+
+  <div class="card">
+    <h3 style="margin-bottom: 15px; color: var(--sage-dark);">Acceso al Estudiante</h3>
+    <p style="font-size: 12px; color: var(--text-muted);">Ingresa tus 13 dígitos de identidad para ver tu expediente y actualizar tu foto de perfil.</p>
+    <div class="input-group">
+      <input type="text" id="student-id" placeholder="Ej: 1214200001234" maxlength="13">
+      <button class="btn" onclick="buscarEstudiante()">Consultar</button>
+    </div>
+  </div>
+
+  <div id="student-panel" class="hidden">
+    <div class="card">
+      <div class="profile-section">
+        <div class="avatar-frame" onclick="document.getElementById('file-input').click()">
+          <img id="view-avatar" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Avatar">
+          <div class="upload-overlay">CAMBIAR FOTO</div>
+        </div>
+        <input type="file" id="file-input" class="hidden" accept="image/*" onchange="subirFotoEnNube(this)">
+        <h2 id="view-name" style="color: var(--sage-light); font-family: 'Playfair Display', serif;">—</h2>
+        <span id="view-id" style="font-size: 12px; color: var(--text-muted); font-weight: 600;">—</span>
+      </div>
+
+      <h3 style="color: var(--sage-dark); margin-bottom: 10px; font-family: 'Playfair Display', serif;">Tus Calificaciones</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Asignatura</th>
+              <th>I Parcial</th>
+              <th>II Parcial</th>
+              <th>III Parcial</th>
+              <th>IV Parcial</th>
+              <th>Promedio Anual</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-alumno-notas"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDTejqs2pgdGyTw1GNBhCr__joDXqpvnZk",
+    authDomain: "portal-ips-san-pedro.firebaseapp.com",
+    databaseURL: "https://portal-ips-san-pedro-default-rtdb.firebaseio.com",
+    projectId: "portal-ips-san-pedro",
+    storageBucket: "portal-ips-san-pedro.firebasestorage.app",
+    messagingSenderId: "992828018359",
+    appId: "1:992828018359:web:a4419792d82580d21c0732"
+  };
+  
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+  let alumnoActualId = "";
+
+  function buscarEstudiante() {
+    const id = document.getElementById('student-id').value.trim();
+    if (id.length !== 13) { alert("Por favor ingresa un ID válido de 13 dígitos."); return; }
+    
+    alumnoActualId = id;
+
+    database.ref('alumnos_fotos/' + id).on('value', snapshot => {
+      const dataFoto = snapshot.val();
+      if(dataFoto && dataFoto.foto) {
+        document.getElementById('view-avatar').src = dataFoto.foto;
+      } else {
+        document.getElementById('view-avatar').src = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+      }
+    });
+
+    database.ref('notas_publicadas/' + id).on('value', snapshot => {
+      const dataNotas = snapshot.val();
+      if (!dataNotas) {
+        alert("Aún no tienes calificaciones registradas en el sistema.");
+        document.getElementById('student-panel').classList.add('hidden');
+        return;
+      }
+
+      document.getElementById('view-name').textContent = dataNotas.nombre;
+      document.getElementById('view-id').textContent = "Identidad: " + id;
+      
+      const tbody = document.getElementById('tbody-alumno-notas');
+      tbody.innerHTML = '';
+
+      if (dataNotas.asignaturas) {
+        Object.keys(dataNotas.asignaturas).forEach(materia => {
+          const m = dataNotas.asignaturas[materia];
+          let tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td style="text-align:left; font-weight:600; padding-left:15px;">${materia}</td>
+            <td>${m.I ? m.I.total : '-'}</td>
+            <td>${m.II ? m.II.total : '-'}</td>
+            <td>${m.III ? m.III.total : '-'}</td>
+            <td>${m.IV ? m.IV.total : '-'}</td>
+            <td style="font-weight:700; background: rgba(251, 228, 216, 0.4);">${m.promedioAnual || '-'}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+      document.getElementById('student-panel').classList.remove('hidden');
+    });
+  }
+
+  function subirFotoEnNube(input) {
+    const file = input.files[0];
+    if (!file || !alumnoActualId) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 160;
+        const scaleSize = MAX_WIDTH / img.width;
+        canvas.width = MAX_WIDTH;
+        canvas.height = img.height * scaleSize;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        const fotoComprimidaBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+        database.ref('alumnos_fotos/' + alumnoActualId).set({
+          foto: fotoComprimidaBase64
+        }).then(() => {
+          alert("¡Tu foto se guardó en la nube correctamente!");
+        }).catch(err => alert("Error al subir la imagen."));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+</script>
+</body>
+</html>
