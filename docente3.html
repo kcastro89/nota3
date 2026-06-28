@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Docente — Karla Castro · IPSPT</title>
+
+<!-- Tipografía Premium -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- Iconos -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+<!-- Firebase SDK v9 (compat mode para uso sin bundler) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
+<style>
+/* ============================================================
+   TOKENS DE DISEÑO
+   ============================================================ */
+:root {
+  --p700: #6C5F8D;
+  --p500: #9C8CB9;
+  --p300: #BA96C1;
+  --p100: #DCD7D5;
+  --p50:  #F5F3F8;
+
+  --surface:    #FFFFFF;
+  --surface2:   #F8F7FB;
+  --surface3:   #F0EEF6;
+  --border:     #E8E4F0;
+  --border-md:  #C8C0DC;
+
+  --text:       #1A1625;
+  --text-md:    #4A4360;
+  --text-sm:    #7E7A94;
+
+  --pass:   #2E7D52;
+  --pass-bg:#E8F5EE;
+  --fail:   #B34040;
+  --fail-bg:#FDEAEA;
+
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --shadow-xs: 0 1px 3px rgba(108,95,141,.08);
+  --shadow-sm: 0 4px 12px rgba(108,95,141,.10);
+  --shadow-md: 0 8px 24px rgba(108,95,141,.14);
+  --shadow-lg: 0 16px 48px rgba(108,95,141,.18);
+
+  --sidebar-w: 260px;
+  --header-h:  64px;
+  --anim: .22s cubic-bezier(.4,0,.2,1);
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+  background: var(--surface2);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   PANTALLA DE LOGIN
+   ============================================================ */
+#login-screen {
+  position: fixed; inset: 0; z-index: 9999;
+  background: linear-gradient(135deg, #F5F3F8 0%, #EDE9F4 50%, #E3DDF0 100%);
+  display: flex; align-items: center; justify-content: center;
+}
+.login-card {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.login-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--p700), var(--p300));
+}
+.login-logo-area {
+  margin-bottom: 28px;
+}
+.login-logo-placeholder {
+  width: 72px; height: 72px;
+  background: var(--p50);
+  border: 2px dashed var(--p300);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 14px;
+  color: var(--p700); font-size: 22px;
+}
+.login-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px; font-weight: 700;
+  color: var(--p700);
+  line-height: 1.2;
+}
+.login-sub {
+  font-size: 12px; color: var(--text-sm);
+  margin-top: 4px;
+}
+.login-form { margin-top: 28px; display: flex; flex-direction: column; gap: 14px; }
+.login-form .inp-group { text-align: left; }
+.login-form label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--text-md); display: block; margin-bottom: 6px; }
+.login-form input {
+  width: 100%; padding: 11px 14px;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px; color: var(--text);
+  transition: border-color var(--anim), box-shadow var(--anim);
+  outline: none;
+}
+.login-form input:focus {
+  border-color: var(--p700);
+  box-shadow: 0 0 0 3px rgba(108,95,141,.12);
+  background: #fff;
+}
+#login-error {
+  font-size: 12px; color: var(--fail);
+  background: var(--fail-bg);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  display: none;
+}
+.btn-login {
+  padding: 12px;
+  background: linear-gradient(135deg, var(--p700), var(--p500));
+  color: #fff; border: none; border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: opacity var(--anim), transform var(--anim);
+  margin-top: 4px;
+}
+.btn-login:hover { opacity: .88; transform: translateY(-1px); }
+.btn-login:active { transform: none; }
+
+/* ============================================================
+   LAYOUT PRINCIPAL
+   ============================================================ */
+#app { display: none; min-height: 100vh; }
+#app.visible { display: flex; }
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  position: fixed; top: 0; left: 0; bottom: 0; z-index: 200;
+  transition: transform var(--anim);
+  box-shadow: var(--shadow-sm);
+}
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.logo-area {
+  display: flex; align-items: center; gap: 12px;
+}
+.logo-placeholder {
+  width: 42px; height: 42px; border-radius: 10px;
+  background: var(--p50); border: 2px dashed var(--p300);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--p700); font-size: 16px; flex-shrink: 0;
+  cursor: pointer;
+  transition: background var(--anim);
+}
+.logo-placeholder:hover { background: var(--p100); }
+#logo-img { width:42px; height:42px; border-radius:10px; object-fit:cover; display:none; }
+.instituto-info .name {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px; font-weight: 700;
+  color: var(--p700); line-height: 1.2;
+}
+.instituto-info .sub {
+  font-size: 10px; color: var(--text-sm); margin-top: 2px;
+}
+.sidebar-nav {
+  flex: 1; padding: 16px 12px;
+  overflow-y: auto;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.nav-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--text-sm);
+  padding: 8px 10px 4px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: var(--radius-sm);
+  cursor: pointer; font-size: 13px; font-weight: 500;
+  color: var(--text-md);
+  transition: background var(--anim), color var(--anim);
+  border: none; background: transparent; width: 100%; text-align: left;
+}
+.nav-item i { width: 18px; text-align: center; font-size: 14px; }
+.nav-item:hover { background: var(--surface3); color: var(--p700); }
+.nav-item.active {
+  background: linear-gradient(135deg, var(--p50), rgba(108,95,141,.08));
+  color: var(--p700); font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--p700);
+}
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+}
+.user-chip {
+  display: flex; align-items: center; gap: 10px;
+}
+.avatar-mini {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--p700), var(--p300));
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 13px; font-weight: 700; flex-shrink: 0;
+}
+.user-chip .info .name { font-size: 12px; font-weight: 600; color: var(--text); }
+.user-chip .info .role { font-size: 10px; color: var(--text-sm); }
+.btn-logout {
+  margin-left: auto; padding: 5px 8px;
+  background: transparent; border: 1px solid var(--border-md);
+  border-radius: var(--radius-xs); color: var(--text-sm);
+  font-size: 11px; cursor: pointer;
+  transition: all var(--anim);
+}
+.btn-logout:hover { background: var(--fail-bg); color: var(--fail); border-color: var(--fail); }
+
+/* CONTENIDO PRINCIPAL */
+.main-area {
+  margin-left: var(--sidebar-w);
+  flex: 1; display: flex; flex-direction: column; min-height: 100vh;
+}
+.topbar {
+  height: var(--header-h);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 28px;
+  position: sticky; top: 0; z-index: 100;
+  gap: 16px;
+}
+.topbar-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 700; color: var(--p700);
+  flex: 1;
+}
+.sync-status {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--text-sm);
+  background: var(--surface3);
+  padding: 5px 10px; border-radius: 20px;
+}
+.sync-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #ccc; flex-shrink: 0;
+  transition: background .5s;
+}
+.sync-dot.online { background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,.2); }
+.sync-dot.saving { background: #f59e0b; animation: pulse-dot 1s infinite; }
+.content-area { padding: 28px; flex: 1; }
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--p700), var(--p300));
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+.card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px; font-weight: 700; color: var(--p700);
+  margin-bottom: 18px;
+  display: flex; align-items: center; gap: 8px;
+}
+.card-title i { font-size: 15px; color: var(--p500); }
+
+/* ============================================================
+   STAT CARDS (dashboard)
+   ============================================================ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: var(--shadow-xs);
+  display: flex; align-items: center; gap: 16px;
+  transition: transform var(--anim), box-shadow var(--anim);
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.stat-icon {
+  width: 46px; height: 46px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.stat-icon.purple { background: linear-gradient(135deg, var(--p700), var(--p500)); color: #fff; }
+.stat-icon.lilac  { background: linear-gradient(135deg, var(--p300), var(--p100)); color: var(--p700); }
+.stat-icon.green  { background: linear-gradient(135deg, #2E7D52, #4CAF50); color: #fff; }
+.stat-icon.rose   { background: linear-gradient(135deg, #B34040, #E57373); color: #fff; }
+.stat-val { font-size: 26px; font-weight: 700; color: var(--text); line-height: 1; }
+.stat-lbl { font-size: 11px; color: var(--text-sm); margin-top: 3px; }
+
+/* ============================================================
+   CURSOS GRID
+   ============================================================ */
+.cursos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.curso-chip {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer;
+  transition: all var(--anim);
+  position: relative; overflow: hidden;
+}
+.curso-chip::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  background: var(--p300);
+  border-radius: 4px 0 0 4px;
+  transition: background var(--anim);
+}
+.curso-chip:hover { border-color: var(--p500); box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+.curso-chip:hover::before { background: var(--p700); }
+.curso-chip.active-curso {
+  background: linear-gradient(135deg, var(--p50), rgba(108,95,141,.08));
+  border-color: var(--p700);
+}
+.curso-chip.active-curso::before { background: var(--p700); }
+.curso-chip .chip-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.curso-chip .chip-count {
+  font-size: 11px; font-weight: 700;
+  background: var(--p50); color: var(--p700);
+  padding: 3px 8px; border-radius: 20px;
+}
+
+/* ============================================================
+   FORMULARIOS
+   ============================================================ */
+.form-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; align-items: flex-end; }
+.field { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 140px; }
+.field label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--text-md);
+}
+input, select {
+  padding: 10px 12px;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px; color: var(--text);
+  outline: none; width: 100%;
+  transition: border-color var(--anim), box-shadow var(--anim), background var(--anim);
+  font-family: 'Inter', sans-serif;
+}
+input:focus, select:focus {
+  border-color: var(--p700);
+  box-shadow: 0 0 0 3px rgba(108,95,141,.10);
+  background: #fff;
+}
+
+/* ============================================================
+   BOTONES
+   ============================================================ */
+.btn {
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 12px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .04em; cursor: pointer;
+  transition: all var(--anim);
+  display: inline-flex; align-items: center; gap: 6px;
+  white-space: nowrap; border: none;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: none; }
+.btn-primary {
+  background: linear-gradient(135deg, var(--p700), var(--p500));
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(108,95,141,.30);
+}
+.btn-primary:hover { box-shadow: 0 4px 16px rgba(108,95,141,.40); }
+.btn-secondary {
+  background: var(--surface3);
+  color: var(--p700);
+  border: 1.5px solid var(--border-md);
+}
+.btn-secondary:hover { background: var(--p50); border-color: var(--p500); }
+.btn-danger {
+  background: var(--fail-bg); color: var(--fail);
+  border: 1.5px solid rgba(179,64,64,.25);
+}
+.btn-danger:hover { background: #f8d0d0; }
+.btn-sm { padding: 6px 12px; font-size: 11px; }
+.btn-xs { padding: 4px 8px; font-size: 10px; }
+
+/* ============================================================
+   PARCIALES TABS
+   ============================================================ */
+.parcial-tabs {
+  display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap;
+}
+.ptab {
+  padding: 7px 16px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border-md);
+  background: var(--surface);
+  color: var(--text-md); font-size: 12px; font-weight: 600;
+  cursor: pointer;
+  transition: all var(--anim);
+}
+.ptab:hover { border-color: var(--p500); color: var(--p700); }
+.ptab.active {
+  background: linear-gradient(135deg, var(--p700), var(--p500));
+  color: #fff; border-color: transparent;
+  box-shadow: 0 2px 8px rgba(108,95,141,.3);
+}
+
+/* ============================================================
+   TABLA DE NOTAS
+   ============================================================ */
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-top: 16px;
+  box-shadow: var(--shadow-xs);
+}
+table {
+  width: 100%; border-collapse: collapse;
+  font-size: 12px; min-width: 960px;
+  background: var(--surface);
+}
+thead th {
+  background: linear-gradient(180deg, var(--surface3), var(--p50));
+  color: var(--p700);
+  font-family: 'Playfair Display', serif;
+  font-weight: 700; font-size: 12px;
+  padding: 11px 8px;
+  border-bottom: 2px solid var(--border);
+  position: sticky; top: 0; z-index: 10;
+  white-space: nowrap;
+}
+thead th input {
+  background: transparent; border: none;
+  border-bottom: 1.5px dashed var(--p500);
+  color: var(--p700); text-align: center;
+  font-weight: 700; font-size: 11px;
+  width: 80px; padding: 2px 4px;
+  outline: none;
+}
+thead th input:focus { border-bottom-color: var(--p700); }
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background var(--anim);
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--p50); }
+tbody td { padding: 9px 8px; text-align: center; }
+.td-alumno { text-align: left !important; }
+.alu-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  object-fit: cover; border: 2px solid var(--border);
+  flex-shrink: 0;
+}
+.alu-avatar-default {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--p300), var(--p100));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: var(--p700);
+  flex-shrink: 0;
+}
+.alu-info { display: flex; align-items: center; gap: 10px; }
+.alu-name { font-weight: 600; font-size: 12px; }
+.alu-id { font-size: 10px; color: var(--text-sm); }
+.grade-input {
+  width: 48px; padding: 5px 4px;
+  text-align: center;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--surface2);
+  font-size: 12px; font-weight: 500;
+  transition: border-color var(--anim);
+}
+.grade-input:focus { border-color: var(--p700); background: #fff; outline: none; }
+.acum-cell {
+  font-weight: 700; color: var(--text-md);
+}
+.final-cell {
+  font-weight: 800; font-size: 15px;
+  color: var(--p700);
+}
+.final-cell.pass { color: var(--pass); }
+.final-cell.fail { color: var(--fail); }
+.badge-genero {
+  font-size: 9px; font-weight: 700; padding: 2px 6px;
+  border-radius: 10px; text-transform: uppercase;
+}
+.badge-f { background: #FCE4EC; color: #C2185B; }
+.badge-m { background: #E3F2FD; color: #1565C0; }
+
+/* ============================================================
+   SEARCH & FILTER BAR
+   ============================================================ */
+.search-bar {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  transition: border-color var(--anim);
+}
+.search-bar:focus-within { border-color: var(--p700); background: #fff; }
+.search-bar i { color: var(--text-sm); font-size: 13px; }
+.search-bar input {
+  border: none; background: transparent;
+  font-size: 13px; color: var(--text);
+  flex: 1; outline: none; padding: 0;
+  box-shadow: none !important;
+}
+
+/* ============================================================
+   OFFLINE BANNER
+   ============================================================ */
+.offline-banner {
+  background: #FFF8E1;
+  border: 1px solid #FFD54F;
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  font-size: 12px; color: #6D5C00;
+  display: none; align-items: center; gap: 8px;
+  margin-bottom: 16px;
+}
+.offline-banner.show { display: flex; }
+
+/* ============================================================
+   UPLOAD ZONE (logo)
+   ============================================================ */
+.export-bar {
+  background: linear-gradient(135deg, var(--p50), rgba(186,150,193,.08));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.export-bar-text h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px; color: var(--p700); font-weight: 700;
+}
+.export-bar-text p { font-size: 11px; color: var(--text-sm); margin-top: 2px; }
+.export-bar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+#toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9998;
+  background: var(--text); color: #fff;
+  padding: 12px 18px; border-radius: var(--radius-md);
+  font-size: 13px; font-weight: 500;
+  box-shadow: var(--shadow-md);
+  transform: translateY(100px); opacity: 0;
+  transition: all .3s cubic-bezier(.4,0,.2,1);
+  display: flex; align-items: center; gap: 8px;
+  max-width: 340px;
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+#toast.success { background: var(--pass); }
+#toast.error   { background: var(--fail); }
+#toast.info    { background: var(--p700); }
+
+/* ============================================================
+   LOADING OVERLAY
+   ============================================================ */
+#loading-overlay {
+  position: fixed; inset: 0; z-index: 9990;
+  background: rgba(245,243,248,.85);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 16px;
+}
+.spinner {
+  width: 44px; height: 44px;
+  border: 3px solid var(--p100);
+  border-top-color: var(--p700);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+#loading-overlay p { font-size: 13px; color: var(--text-sm); }
+
+/* ============================================================
+   ANIMACIONES
+   ============================================================ */
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse-dot { 0%,100% { opacity:1; } 50% { opacity:.3; } }
+@keyframes fadeInUp {
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.fade-in { animation: fadeInUp .3s ease both; }
+
+/* ============================================================
+   HIDDEN / UTILITY
+   ============================================================ */
+.hidden { display: none !important; }
+.mt-4 { margin-top: 16px; }
+.gap-8 { gap: 8px; }
+.text-muted { color: var(--text-sm); font-size: 12px; }
+
+/* ============================================================
+   FIREBASE CONFIG MODAL
+   ============================================================ */
+#firebase-modal {
+  position: fixed; inset: 0; z-index: 9995;
+  background: rgba(26,22,37,.5);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.firebase-modal-card {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 36px 32px;
+  width: 100%; max-width: 540px;
+  max-height: 90vh; overflow-y: auto;
+  position: relative;
+}
+.firebase-modal-card h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; color: var(--p700); font-weight: 700;
+  margin-bottom: 8px;
+}
+.firebase-modal-card p { font-size: 13px; color: var(--text-sm); margin-bottom: 20px; line-height: 1.6; }
+.firebase-form { display: flex; flex-direction: column; gap: 10px; }
+.firebase-form .field label { font-size: 11px; }
+.firebase-form input { font-size: 12px; }
+.firebase-note {
+  background: var(--p50);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 11px; color: var(--text-md);
+  line-height: 1.6;
+  margin-top: 4px;
+}
+.firebase-note b { color: var(--p700); }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px) {
+  :root { --sidebar-w: 0px; }
+  .sidebar { transform: translateX(-260px); }
+  .sidebar.open { transform: translateX(0); --sidebar-w: 260px; }
+  .main-area { margin-left: 0; }
+  .topbar { padding: 0 16px; }
+  .content-area { padding: 16px; }
+  #menu-toggle { display: flex !important; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+#menu-toggle {
+  display: none; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border); background: transparent;
+  color: var(--text-md); cursor: pointer; font-size: 16px;
+}
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0; z-index: 150;
+  background: rgba(0,0,0,.3);
+}
+.sidebar-overlay.show { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     FIREBASE CONFIG MODAL
+     ============================================================ -->
+<div id="firebase-modal" class="hidden">
+  <div class="firebase-modal-card fade-in">
+    <h2>🔥 Conectar con Firebase</h2>
+    <p>Para activar la sincronización en la nube, ingresa las credenciales de tu proyecto Firebase. Esta configuración se guarda localmente y solo es necesario hacerlo una vez.</p>
+    <div class="firebase-form">
+      <div class="field"><label>API Key</label><input id="fb-apiKey" placeholder="AIzaSy..."></div>
+      <div class="field"><label>Auth Domain</label><input id="fb-authDomain" placeholder="mi-proyecto.firebaseapp.com"></div>
+      <div class="field"><label>Project ID</label><input id="fb-projectId" placeholder="mi-proyecto"></div>
+      <div class="field"><label>Storage Bucket</label><input id="fb-storageBucket" placeholder="mi-proyecto.appspot.com"></div>
+      <div class="field"><label>Messaging Sender ID</label><input id="fb-messagingSenderId" placeholder="123456789"></div>
+      <div class="field"><label>App ID</label><input id="fb-appId" placeholder="1:123:web:abc..."></div>
+    </div>
+    <div class="firebase-note" style="margin-top:12px;">
+      <b>¿Dónde encontrar esto?</b><br>
+      Consola Firebase → Tu proyecto → ⚙️ Configuración del proyecto → <b>Tus apps → SDK de configuración</b>.<br>
+      Si aún no tienes un proyecto, créalo en <b>console.firebase.google.com</b>. Es gratis.
+    </div>
+    <div style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="inicializarFirebase()"><i class="fa fa-fire"></i> Conectar</button>
+      <button class="btn btn-secondary" onclick="usarModoLocal()"><i class="fa fa-database"></i> Usar sin Firebase (modo local)</button>
+    </div>
+    <p id="fb-error" style="color:var(--fail); font-size:12px; margin-top:10px; display:none;"></p>
+  </div>
+</div>
+
+<!-- ============================================================
+     LOGIN
+     ============================================================ -->
+<div id="login-screen" class="hidden">
+  <div class="login-card fade-in">
+    <div class="login-logo-area">
+      <div class="login-logo-placeholder" id="login-logo-wrap">
+        <i class="fa fa-school"></i>
+      </div>
+      <div class="login-title">IPSPT</div>
+      <div class="login-sub">Panel Docente · Karla Castro</div>
+    </div>
+    <div class="login-form">
+      <div class="inp-group">
+        <label>Correo electrónico</label>
+        <input type="email" id="inp-email" placeholder="correo@ejemplo.com" autocomplete="username">
+      </div>
+      <div class="inp-group">
+        <label>Contraseña</label>
+        <input type="password" id="inp-pass" placeholder="••••••••" autocomplete="current-password"
+          onkeydown="if(event.key==='Enter') loginBtn()">
+      </div>
+      <p id="login-error"></p>
+      <button class="btn-login" onclick="loginBtn()"><i class="fa fa-lock"></i> Ingresar al Panel</button>
+    </div>
+    <p style="font-size:11px; color:var(--text-sm); margin-top:20px;">
+      Instituto Polivalente San Pedro de Tutule · Cané, La Paz, Honduras
+    </p>
+  </div>
+</div>
+
+<!-- ============================================================
+     LOADING
+     ============================================================ -->
+<div id="loading-overlay" class="hidden">
+  <div class="spinner"></div>
+  <p id="loading-msg">Cargando datos…</p>
+</div>
+
+<!-- ============================================================
+     APP PRINCIPAL
+     ============================================================ -->
+<div id="app">
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-area">
+        <div class="logo-placeholder" id="logo-wrap" onclick="document.getElementById('logo-file').click()" title="Click para cambiar logo">
+          <i class="fa fa-school"></i>
+        </div>
+        <img id="logo-img" src="" alt="Logo IPSPT">
+        <input type="file" id="logo-file" class="hidden" accept="image/*" onchange="cargarLogo(this)">
+        <div class="instituto-info">
+          <div class="name">IPSPT</div>
+          <div class="sub">Cané, La Paz · Honduras</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-label">Principal</div>
+      <button class="nav-item active" id="nav-dashboard" onclick="showView('dashboard')">
+        <i class="fa fa-chart-pie"></i> Dashboard
+      </button>
+      <button class="nav-item" id="nav-cursos" onclick="showView('cursos')">
+        <i class="fa fa-book-open"></i> Cursos & Notas
+      </button>
+
+      <div class="nav-label" style="margin-top:8px;">Datos</div>
+      <button class="nav-item" id="nav-export" onclick="showView('export')">
+        <i class="fa fa-share-square"></i> Publicación Estudiantil
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-chip">
+        <div class="avatar-mini">K</div>
+        <div class="info">
+          <div class="name">Karla Castro</div>
+          <div class="role">Docente · Matemáticas</div>
+        </div>
+        <button class="btn-logout" onclick="logout()" title="Cerrar sesión"><i class="fa fa-sign-out-alt"></i></button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <div class="main-area">
+    <header class="topbar">
+      <button id="menu-toggle" onclick="toggleSidebar()"><i class="fa fa-bars"></i></button>
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div class="sync-status">
+        <div class="sync-dot" id="sync-dot"></div>
+        <span id="sync-label">Local</span>
+      </div>
+    </header>
+
+    <div class="content-area" id="content-area">
+
+      <!-- ====== VISTA: DASHBOARD ====== -->
+      <div id="view-dashboard" class="fade-in">
+        <div class="stats-grid" id="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon purple"><i class="fa fa-book"></i></div>
+            <div><div class="stat-val" id="stat-cursos">0</div><div class="stat-lbl">Cursos activos</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon lilac"><i class="fa fa-users"></i></div>
+            <div><div class="stat-val" id="stat-alumnos">0</div><div class="stat-lbl">Alumnos inscritos</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green"><i class="fa fa-star"></i></div>
+            <div><div class="stat-val" id="stat-pass">—</div><div class="stat-lbl">Promedio general</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon rose"><i class="fa fa-sync-alt"></i></div>
+            <div><div class="stat-val" id="stat-sync">—</div><div class="stat-lbl">Última sincronización</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><i class="fa fa-list-ul"></i> Resumen de Cursos</div>
+          <div id="dashboard-cursos-list" class="text-muted">Sin cursos creados todavía.</div>
+        </div>
+      </div>
+
+      <!-- ====== VISTA: CURSOS & NOTAS ====== -->
+      <div id="view-cursos" class="hidden fade-in">
+
+        <div class="offline-banner" id="offline-banner">
+          <i class="fa fa-wifi-slash"></i>
+          Sin conexión — los cambios se guardan localmente y sincronizarán cuando vuelva internet.
+        </div>
+
+        <!-- Crear curso -->
+        <div class="card">
+          <div class="card-title"><i class="fa fa-plus-circle"></i> Crear Nuevo Curso</div>
+          <div class="form-row">
+            <div class="field" style="max-width:160px;">
+              <label>Año / Grado</label>
+              <select id="inp-grado">
+                <option value="">— Seleccionar —</option>
+                <option>7° Año</option><option>8° Año</option><option>9° Año</option>
+                <option>10° Año</option><option>11° Año</option>
+              </select>
+            </div>
+            <div class="field" style="max-width:100px;">
+              <label>Sección</label>
+              <select id="inp-seccion">
+                <option>1</option><option>2</option><option>3</option><option>4</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Asignatura</label>
+              <input type="text" id="inp-curso-custom" placeholder="Ej: Matemáticas">
+            </div>
+            <button class="btn btn-primary" onclick="agregarCurso()">
+              <i class="fa fa-plus"></i> Crear Curso
+            </button>
+          </div>
+          <div id="cursos-grid" class="cursos-grid"></div>
+        </div>
+
+        <!-- Libro de calificaciones -->
+        <div id="panel-libro" class="hidden">
+          <div class="card">
+            <div class="card-title" id="lbl-curso-actual"><i class="fa fa-table"></i> —</div>
+
+            <!-- Tabs parciales -->
+            <div class="parcial-tabs">
+              <button class="ptab active" id="pbtn-I"   onclick="setParcial('I')">I Parcial</button>
+              <button class="ptab"         id="pbtn-II"  onclick="setParcial('II')">II Parcial</button>
+              <button class="ptab"         id="pbtn-III" onclick="setParcial('III')">III Parcial</button>
+              <button class="ptab"         id="pbtn-IV"  onclick="setParcial('IV')">IV Parcial</button>
+            </div>
+
+            <!-- Inscribir alumno -->
+            <div class="form-row" style="background:var(--surface2); padding:14px; border-radius:var(--radius-sm); border:1px solid var(--border);">
+              <div class="field" style="max-width:170px;">
+                <label>Identidad (13 dígitos)</label>
+                <input type="text" id="inp-alu-id" maxlength="13" placeholder="0000000000000">
+              </div>
+              <div class="field">
+                <label>Nombre del Alumno</label>
+                <input type="text" id="inp-alu-nombre" placeholder="Apellidos, Nombres">
+              </div>
+              <div class="field" style="max-width:100px;">
+                <label>Género</label>
+                <select id="inp-alu-genero">
+                  <option value="F">Niña</option>
+                  <option value="M">Niño</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" onclick="agregarAlumno()">
+                <i class="fa fa-user-plus"></i> Inscribir
+              </button>
+            </div>
+
+            <!-- Búsqueda -->
+            <div class="search-bar mt-4">
+              <i class="fa fa-search"></i>
+              <input type="text" id="buscar-alu" placeholder="Buscar alumno por nombre o identidad…" oninput="renderTabla()">
+            </div>
+
+            <!-- Tabla -->
+            <div class="table-wrap">
+              <table>
+                <thead id="thead-notes"></thead>
+                <tbody id="tbody-notas"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== VISTA: EXPORTAR ====== -->
+      <div id="view-export" class="hidden fade-in">
+        <div class="card">
+          <div class="card-title"><i class="fa fa-share-square"></i> Publicación Estudiantil Desglosada</div>
+          <p class="text-muted" style="margin-bottom:20px; line-height:1.7;">
+            Genera el archivo JSON con Acumulados, Exámenes, Totales por parcial y Promedio Anual
+            para que los alumnos puedan consultar sus notas en el Panel Estudiantil.
+          </p>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="exportarParaAlumnos()">
+              <i class="fa fa-download"></i> Generar Base de Datos para Alumnos
+            </button>
+            <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">
+              <i class="fa fa-upload"></i> Importar Datos Anteriores
+            </button>
+            <input type="file" id="import-file" class="hidden" accept=".json" onchange="importarDatos(this)">
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><i class="fa fa-info-circle"></i> Instrucciones</div>
+          <ol style="padding-left:20px; color:var(--text-md); font-size:13px; line-height:2;">
+            <li>Asegúrate de haber ingresado todas las notas del período.</li>
+            <li>Haz clic en <b>Generar Base de Datos para Alumnos</b>.</li>
+            <li>El archivo <code>notas_alumnos.json</code> se descargará automáticamente.</li>
+            <li>Sube ese archivo al Panel Estudiantil para que los alumnos puedan acceder.</li>
+          </ol>
+        </div>
+      </div>
+
+    </div><!-- /content-area -->
+  </div><!-- /main-area -->
+</div><!-- /app -->
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+/* ============================================================
+   ESTADO GLOBAL
+   ============================================================ */
+let DB = {};
+let activeCurso = null;
+let activeParcial = 'I';
+let fbApp = null, fbDb = null, fbAuth = null, fbStorage = null;
+let modoFirebase = false;
+let modoLocal = false;
+let isOnline = navigator.onLine;
+let saveTimeout = null;
+let pendingSync = [];
+
+/* ============================================================
+   FIREBASE — CONFIGURACIÓN
+   ============================================================ */
+function inicializarFirebase() {
+  // Config ya está hardcodeada en FIREBASE_CONFIG
+  try {
+    if (firebase.apps.length === 0) firebase.initializeApp(FIREBASE_CONFIG);
+    fbDb      = firebase.firestore();
+    fbAuth    = firebase.auth();
+    fbStorage = firebase.storage();
+    modoFirebase = true;
+    document.getElementById('firebase-modal').classList.add('hidden');
+    document.getElementById('login-screen').classList.remove('hidden');
+    setSyncStatus('online');
+  } catch(e) {
+    const errEl = document.getElementById('fb-error');
+    if (errEl) { errEl.textContent = 'Error: ' + e.message; errEl.style.display = 'block'; }
+  }
+}
+
+function usarModoLocal() {
+  modoLocal = true;
+  modoFirebase = false;
+  localStorage.setItem('fb_cfg', 'local');
+  document.getElementById('firebase-modal').classList.add('hidden');
+  // Cargar DB local y mostrar app directamente
+  DB = JSON.parse(localStorage.getItem('ips_esperanza_notas') || '{}');
+  mostrarApp();
+}
+
+/* ============================================================
+   AUTENTICACIÓN
+   ============================================================ */
+function loginBtn() {
+  if (modoLocal) { mostrarApp(); return; }
+  const email = document.getElementById('inp-email').value.trim();
+  const pass  = document.getElementById('inp-pass').value;
+  const errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+
+  showLoading('Verificando credenciales…');
+  fbAuth.signInWithEmailAndPassword(email, pass)
+    .then(() => { hideLoading(); mostrarApp(); })
+    .catch(e => {
+      hideLoading();
+      errEl.textContent = traducirErrorAuth(e.code);
+      errEl.style.display = 'block';
+    });
+}
+
+function traducirErrorAuth(code) {
+  const map = {
+    'auth/wrong-password':    'Contraseña incorrecta.',
+    'auth/user-not-found':    'No existe una cuenta con ese correo.',
+    'auth/invalid-email':     'Correo electrónico inválido.',
+    'auth/too-many-requests': 'Demasiados intentos. Espera un momento.',
+    'auth/network-request-failed': 'Sin conexión a internet.',
+  };
+  return map[code] || 'Error al iniciar sesión (' + code + ')';
+}
+
+function logout() {
+  if (confirm('¿Cerrar sesión?')) {
+    if (modoFirebase) fbAuth.signOut();
+    location.reload();
+  }
+}
+
+/* ============================================================
+   INICIALIZACIÓN
+   ============================================================ */
+/* ============================================================
+   CONFIGURACIÓN FIREBASE — portal-ips-san-pedro
+   ============================================================ */
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyDTejqs2pgdGyTw1GNBhCr__joDXqpvnZk",
+  authDomain:        "portal-ips-san-pedro.firebaseapp.com",
+  projectId:         "portal-ips-san-pedro",
+  storageBucket:     "portal-ips-san-pedro.firebasestorage.app",
+  messagingSenderId: "992828018359",
+  appId:             "1:992828018359:web:a4419792d82580d21c0732",
+  measurementId:     "G-SWEDHKSYPT"
+};
+
+window.onload = function() {
+  // Ocultar modal de config (ya no es necesario)
+  document.getElementById('firebase-modal').classList.add('hidden');
+
+  // Inicializar Firebase con config fija
+  try {
+    if (firebase.apps.length === 0) {
+      firebase.initializeApp(FIREBASE_CONFIG);
+    }
+    fbDb      = firebase.firestore();
+    fbAuth    = firebase.auth();
+    fbStorage = firebase.storage();
+    modoFirebase = true;
+
+    // Verificar sesión activa
+    fbAuth.onAuthStateChanged(user => {
+      if (user) {
+        mostrarApp();
+      } else {
+        document.getElementById('login-screen').classList.remove('hidden');
+      }
+    });
+  } catch(e) {
+    console.warn('Firebase no disponible, usando modo local:', e.message);
+    modoLocal = true;
+    DB = JSON.parse(localStorage.getItem('ips_esperanza_notas') || '{}');
+    mostrarApp();
+  }
+
+  // Listeners de conectividad
+  window.addEventListener('online',  () => { isOnline = true;  setSyncStatus('online');  ocultarOfflineBanner(); syncPending(); });
+  window.addEventListener('offline', () => { isOnline = false; setSyncStatus('offline'); mostrarOfflineBanner(); });
+};
+
+/* ============================================================
+   MOSTRAR APP
+   ============================================================ */
+function mostrarApp() {
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app').classList.add('visible');
+  setSyncStatus(modoLocal ? 'local' : (isOnline ? 'online' : 'offline'));
+
+  if (modoFirebase) {
+    cargarDBdesdeFirestore();
+  } else {
+    renderAll();
+  }
+}
+
+/* ============================================================
+   FIRESTORE — CARGAR / GUARDAR
+   ============================================================ */
+function cargarDBdesdeFirestore() {
+  showLoading('Sincronizando con la nube…');
+  fbDb.collection('cursos').get()
+    .then(snap => {
+      DB = {};
+      snap.forEach(doc => { DB[doc.id] = doc.data(); });
+      // Migrar datos locales si existe y Firestore está vacío
+      if (Object.keys(DB).length === 0) {
+        const local = JSON.parse(localStorage.getItem('ips_esperanza_notas') || '{}');
+        if (Object.keys(local).length > 0 && confirm('Se encontraron datos locales. ¿Migrarlos a Firebase?')) {
+          DB = local;
+          subirTodoAFirestore().then(() => { hideLoading(); renderAll(); toast('Datos migrados a Firebase ✓', 'success'); });
+          return;
+        }
+      }
+      hideLoading();
+      renderAll();
+      // Escucha en tiempo real
+      fbDb.collection('cursos').onSnapshot(snap2 => {
+        snap2.forEach(doc => { DB[doc.id] = doc.data(); });
+        renderAll();
+        actualizarHoraSync();
+      });
+    })
+    .catch(e => {
+      hideLoading();
+      toast('Error cargando datos: ' + e.message, 'error');
+      // Fallback local
+      DB = JSON.parse(localStorage.getItem('ips_esperanza_notas') || '{}');
+      renderAll();
+    });
+}
+
+async function subirTodoAFirestore() {
+  const batch = fbDb.batch();
+  Object.keys(DB).forEach(key => {
+    batch.set(fbDb.collection('cursos').doc(key), DB[key]);
+  });
+  await batch.commit();
+}
+
+function save() {
+  // Siempre guardar en localStorage como caché / offline fallback
+  localStorage.setItem('ips_esperanza_notas', JSON.stringify(DB));
+  setSyncStatus('saving');
+
+  if (modoFirebase && isOnline && activeCurso) {
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+      fbDb.collection('cursos').doc(activeCurso).set(DB[activeCurso])
+        .then(() => { setSyncStatus('online'); actualizarHoraSync(); })
+        .catch(() => {
+          setSyncStatus('offline');
+          pendingSync.push(activeCurso);
+          mostrarOfflineBanner();
+        });
+    }, 600); // debounce
+  } else if (!isOnline && activeCurso) {
+    if (!pendingSync.includes(activeCurso)) pendingSync.push(activeCurso);
+    setSyncStatus('offline');
+  } else if (modoLocal) {
+    setSyncStatus('local');
+  }
+}
+
+function syncPending() {
+  if (!modoFirebase || !isOnline || pendingSync.length === 0) return;
+  const batch = fbDb.batch();
+  [...new Set(pendingSync)].forEach(key => {
+    if (DB[key]) batch.set(fbDb.collection('cursos').doc(key), DB[key]);
+  });
+  batch.commit()
+    .then(() => { pendingSync = []; setSyncStatus('online'); toast('Cambios sincronizados ✓', 'success'); actualizarHoraSync(); })
+    .catch(() => {});
+}
+
+/* ============================================================
+   INTERFAZ — ESTADO & UTILIDADES
+   ============================================================ */
+function setSyncStatus(state) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  dot.className = 'sync-dot';
+  if (state === 'online')  { dot.classList.add('online');  lbl.textContent = 'Sincronizado'; }
+  else if (state === 'saving') { dot.classList.add('saving');  lbl.textContent = 'Guardando…'; }
+  else if (state === 'offline'){ lbl.textContent = 'Sin conexión'; }
+  else                          { lbl.textContent = 'Modo local'; }
+}
+
+function actualizarHoraSync() {
+  const now = new Date();
+  document.getElementById('stat-sync').textContent =
+    now.toLocaleTimeString('es-HN', {hour:'2-digit', minute:'2-digit'});
+}
+
+function mostrarOfflineBanner() { document.getElementById('offline-banner').classList.add('show'); }
+function ocultarOfflineBanner() { document.getElementById('offline-banner').classList.remove('show'); }
+
+function showLoading(msg) {
+  document.getElementById('loading-msg').textContent = msg || 'Cargando…';
+  document.getElementById('loading-overlay').classList.remove('hidden');
+}
+function hideLoading() {
+  document.getElementById('loading-overlay').classList.add('hidden');
+}
+
+let toastTimer;
+function toast(msg, type = 'info') {
+  const el = document.getElementById('toast');
+  const icons = { success:'✓', error:'✕', info:'ℹ' };
+  el.innerHTML = `<span>${icons[type]||'ℹ'}</span> ${msg}`;
+  el.className = `show ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.className = '', 3200);
+}
+
+function showLogoImg(src) {
+  document.getElementById('logo-img').src = src;
+  document.getElementById('logo-img').style.display = 'block';
+  document.getElementById('logo-wrap').querySelector('i').style.display = 'none';
+}
+
+function cargarLogo(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    localStorage.setItem('ipspt_logo', e.target.result);
+    showLogoImg(e.target.result);
+    toast('Logo actualizado', 'success');
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ============================================================
+   NAVEGACIÓN
+   ============================================================ */
+const views = ['dashboard','cursos','export'];
+
+function showView(name) {
+  views.forEach(v => {
+    document.getElementById('view-'+v).classList.add('hidden');
+    document.getElementById('nav-'+v)?.classList.remove('active');
+  });
+  document.getElementById('view-'+name).classList.remove('hidden');
+  document.getElementById('nav-'+name).classList.add('active');
+  const titles = { dashboard:'Dashboard', cursos:'Cursos & Notas', export:'Publicación Estudiantil' };
+  document.getElementById('topbar-title').textContent = titles[name] || name;
+  if (name === 'dashboard') renderDashboard();
+  closeSidebar();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
+/* ============================================================
+   RENDER GENERAL
+   ============================================================ */
+function renderAll() {
+  renderCursosGrid();
+  renderDashboard();
+  if (activeCurso && DB[activeCurso]) renderTabla();
+  // Restaurar logo
+  const logo = localStorage.getItem('ipspt_logo');
+  if (logo) showLogoImg(logo);
+}
+
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+function renderDashboard() {
+  const keys = Object.keys(DB);
+  let totalAlumnos = 0;
+  let sumPromedios = 0; let countPromedios = 0;
+
+  const listEl = document.getElementById('dashboard-cursos-list');
+  listEl.innerHTML = '';
+
+  keys.forEach(key => {
+    const c = DB[key];
+    totalAlumnos += (c.alumnos || []).length;
+
+    // Calcular promedio del curso
+    let cursoProm = 0; let cursoPCount = 0;
+    (c.alumnos || []).forEach(alu => {
+      let sum = 0; let parcialCount = 0;
+      ['I','II','III','IV'].forEach(p => {
+        const n = c.parciales?.[p]?.notas?.[alu.id];
+        if (n) {
+          let acum = (n.act||[]).reduce((a,v)=>a+(parseFloat(v)||0),0);
+          let total = acum + (parseFloat(n.examen)||0);
+          if (n.act?.some(v=>v!=='') || n.examen!=='') { sum+=total; parcialCount++; }
+        }
+      });
+      if (parcialCount>0) { cursoProm += sum/parcialCount; cursoPCount++; }
+    });
+
+    const promedio = cursoPCount > 0 ? Math.round(cursoProm/cursoPCount) : null;
+    if (promedio !== null) { sumPromedios += promedio; countPromedios++; }
+
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border);';
+    div.innerHTML = `
+      <div>
+        <div style="font-weight:600; font-size:13px;">${c.nombre}</div>
+        <div class="text-muted">${(c.alumnos||[]).length} alumno(s)</div>
+      </div>
+      <div style="text-align:right;">
+        <span style="font-size:18px; font-weight:700; color:var(--p700);">${promedio !== null ? promedio : '—'}</span>
+        <div class="text-muted">promedio</div>
+      </div>
+    `;
+    listEl.appendChild(div);
+  });
+
+  if (keys.length === 0) listEl.innerHTML = '<p class="text-muted">Sin cursos creados todavía.</p>';
+
+  document.getElementById('stat-cursos').textContent = keys.length;
+  document.getElementById('stat-alumnos').textContent = totalAlumnos;
+  document.getElementById('stat-pass').textContent =
+    countPromedios > 0 ? Math.round(sumPromedios/countPromedios) : '—';
+}
+
+/* ============================================================
+   CURSOS
+   ============================================================ */
+function agregarCurso(nombreForzado = null) {
+  if (nombreForzado) {
+    const key = nombreForzado.replace(/\s+/g,'_');
+    if (!DB[key]) {
+      DB[key] = crearEstructuraCurso(nombreForzado);
+    }
+    return key;
+  }
+  const grado  = document.getElementById('inp-grado').value;
+  const seccion = document.getElementById('inp-seccion').value;
+  const custom  = document.getElementById('inp-curso-custom').value.trim();
+  if (!grado || !custom) { toast('Selecciona grado e ingresa asignatura.', 'error'); return; }
+  const key = (grado + '-' + seccion + '-' + custom).replace(/\s+/g,'_');
+  if (!DB[key]) {
+    DB[key] = crearEstructuraCurso(`${grado} (Sec. ${seccion}) — ${custom}`);
+  }
+  save();
+  if (modoFirebase && isOnline) {
+    fbDb.collection('cursos').doc(key).set(DB[key])
+      .then(() => toast('Curso creado en la nube ✓', 'success'))
+      .catch(() => toast('Curso guardado localmente (sin conexión)', 'info'));
+  } else {
+    toast('Curso creado ✓', 'success');
+  }
+  document.getElementById('inp-curso-custom').value = '';
+  renderCursosGrid();
+}
+
+function crearEstructuraCurso(nombre) {
+  return {
+    nombre,
+    alumnos: [],
+    actividadesNombres: {
+      I:  ['Act. 1','Act. 2','Act. 3','Act. 4','Act. 5','Act. 6'],
+      II: ['Act. 1','Act. 2','Act. 3','Act. 4','Act. 5','Act. 6'],
+      III:['Act. 1','Act. 2','Act. 3','Act. 4','Act. 5','Act. 6'],
+      IV: ['Act. 1','Act. 2','Act. 3','Act. 4','Act. 5','Act. 6'],
+    },
+    parciales: {
+      I:   { notas:{} },
+      II:  { notas:{} },
+      III: { notas:{} },
+      IV:  { notas:{} },
+    }
+  };
+}
+
+function renderCursosGrid() {
+  const grid = document.getElementById('cursos-grid');
+  grid.innerHTML = '';
+  Object.keys(DB).forEach(key => {
+    const div = document.createElement('div');
+    div.className = 'curso-chip' + (key === activeCurso ? ' active-curso' : '');
+    div.innerHTML = `
+      <span class="chip-name">${DB[key].nombre}</span>
+      <span class="chip-count">${(DB[key].alumnos||[]).length}</span>
+    `;
+    div.onclick = () => {
+      activeCurso = key;
+      document.getElementById('panel-libro').classList.remove('hidden');
+      document.getElementById('lbl-curso-actual').innerHTML = `<i class="fa fa-table"></i> ${DB[key].nombre}`;
+      setParcial(activeParcial);
+      renderCursosGrid();
+    };
+    grid.appendChild(div);
+  });
+}
+
+/* ============================================================
+   PARCIALES
+   ============================================================ */
+function setParcial(p) {
+  activeParcial = p;
+  ['I','II','III','IV'].forEach(k => {
+    const btn = document.getElementById('pbtn-'+k);
+    btn.classList.toggle('active', k === p);
+  });
+  renderTabla();
+}
+
+function cambiarNombreActividad(idx, val) {
+  if (!activeCurso) return;
+  DB[activeCurso].actividadesNombres[activeParcial][idx] = val;
+  save();
+}
+
+/* ============================================================
+   ALUMNOS
+   ============================================================ */
+function agregarAlumno() {
+  const id     = document.getElementById('inp-alu-id').value.trim();
+  const nombre = document.getElementById('inp-alu-nombre').value.trim();
+  const genero = document.getElementById('inp-alu-genero').value;
+  if (id.length !== 13 || !nombre) { toast('Identidad de 13 dígitos y nombre requeridos.', 'error'); return; }
+  if ((DB[activeCurso].alumnos||[]).find(a=>a.id===id)) { toast('Este alumno ya está inscrito.', 'error'); return; }
+  DB[activeCurso].alumnos.push({ id, nombre, genero, foto: '' });
+  save(); renderTabla();
+  document.getElementById('inp-alu-id').value = '';
+  document.getElementById('inp-alu-nombre').value = '';
+  toast('Alumno inscrito ✓', 'success');
+}
+
+function eliminarAlu(id) {
+  if (!confirm('¿Desvincular alumno?')) return;
+  DB[activeCurso].alumnos = DB[activeCurso].alumnos.filter(a=>a.id!==id);
+  save(); renderTabla();
+  toast('Alumno desvinculado', 'info');
+}
+
+/* ============================================================
+   TABLA DE NOTAS
+   ============================================================ */
+function renderTabla() {
+  if (!activeCurso) return;
+  const c = DB[activeCurso];
+  if (!c) return;
+  const p = c.parciales[activeParcial];
+  const filtro = (document.getElementById('buscar-alu')?.value||'').toLowerCase();
+
+  // Encabezado
+  let th = `<tr>
+    <th style="width:40px;">N°</th>
+    <th style="text-align:left; width:220px;">Alumno</th>
+    <th style="width:50px;">Gén.</th>`;
+  for (let i=0; i<6; i++) {
+    th += `<th><input type="text" value="${c.actividadesNombres[activeParcial][i]}"
+      onchange="cambiarNombreActividad(${i},this.value)"
+      title="Clic para renombrar actividad"></th>`;
+  }
+  th += `<th>Acum<br><small>/50</small></th>
+    <th>Examen<br><small>/50</small></th>
+    <th>Nota<br>Parcial</th>
+    <th style="width:60px;">Acción</th>
+  </tr>`;
+  document.getElementById('thead-notes').innerHTML = th;
+
+  const tbody = document.getElementById('tbody-notas');
+  tbody.innerHTML = '';
+
+  const alumnos = (c.alumnos||[]).filter(alu =>
+    filtro === '' || alu.nombre.toLowerCase().includes(filtro) || alu.id.includes(filtro)
+  );
+
+  if (alumnos.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="12" style="padding:24px; color:var(--text-sm); font-style:italic;">
+      ${filtro ? 'Sin resultados para "'+filtro+'"' : 'Aún no hay alumnos inscritos. Usa el formulario de arriba.'}
+    </td></tr>`;
+    return;
+  }
+
+  alumnos.forEach((alu, idx) => {
+    if (!p.notas[alu.id]) p.notas[alu.id] = { act: Array(6).fill(''), examen: '' };
+    const n = p.notas[alu.id];
+    let acum = 0; (n.act||[]).forEach(v => acum += (parseFloat(v)||0));
+    const total = Math.round(acum + (parseFloat(n.examen)||0));
+    const pasaFinal = total >= 60;
+
+    // Avatar
+    let avatarHtml;
+    if (alu.foto) {
+      avatarHtml = `<img class="alu-avatar" src="${alu.foto}" alt="${alu.nombre}">`;
+    } else {
+      const initials = alu.nombre.trim().split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+      avatarHtml = `<div class="alu-avatar-default">${initials}</div>`;
+    }
+
+    let tdActs = '';
+    for (let i=0; i<6; i++) {
+      tdActs += `<td><input class="grade-input" type="number" step="0.1" min="0"
+        value="${(n.act||[])[i]||''}"
+        onchange="actCelda('${alu.id}','act',${i},this.value,null)"></td>`;
+    }
+
+    const badge = alu.genero === 'F'
+      ? `<span class="badge-genero badge-f">Niña</span>`
+      : `<span class="badge-genero badge-m">Niño</span>`;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${idx+1}</td>
+      <td class="td-alumno">
+        <div class="alu-info">
+          ${avatarHtml}
+          <div>
+            <div class="alu-name">${alu.nombre}</div>
+            <div class="alu-id">${alu.id}</div>
+          </div>
+        </div>
+      </td>
+      <td>${badge}</td>
+      ${tdActs}
+      <td class="acum-cell">${acum.toFixed(1)}</td>
+      <td><input class="grade-input" type="number" min="0" max="50"
+        value="${n.examen||''}"
+        onchange="actCelda('${alu.id}','examen',null,this.value,50)"></td>
+      <td class="final-cell ${pasaFinal ? 'pass' : (total>0?'fail':'')}">${total}</td>
+      <td>
+        <button class="btn btn-danger btn-xs" onclick="eliminarAlu('${alu.id}')" title="Desvincular alumno">
+          <i class="fa fa-trash"></i>
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ============================================================
+   INGRESAR NOTAS
+   ============================================================ */
+function actCelda(id, tipo, idx, val, max) {
+  let num = parseFloat(val);
+  if (isNaN(num) || num < 0) num = '';
+  else if (max && num > max) num = max;
+
+  if (!DB[activeCurso].parciales[activeParcial].notas[id]) {
+    DB[activeCurso].parciales[activeParcial].notas[id] = { act: Array(6).fill(''), examen: '' };
+  }
+
+  if (tipo === 'act') DB[activeCurso].parciales[activeParcial].notas[id].act[idx] = num;
+  else                DB[activeCurso].parciales[activeParcial].notas[id].examen = num;
+
+  save();
+  // Re-render solo la fila para no perder focus
+  renderTablaFila(id);
+}
+
+function renderTablaFila(aluId) {
+  // Actualiza acum y total de la fila sin re-render completo
+  const c = DB[activeCurso];
+  const p = c.parciales[activeParcial];
+  const n = p.notas[aluId];
+  if (!n) return;
+  let acum = 0; (n.act||[]).forEach(v => acum += (parseFloat(v)||0));
+  const total = Math.round(acum + (parseFloat(n.examen)||0));
+
+  // Encontrar la fila por contenido de identidad
+  const rows = document.querySelectorAll('#tbody-notas tr');
+  rows.forEach(tr => {
+    const idEl = tr.querySelector('.alu-id');
+    if (idEl && idEl.textContent === aluId) {
+      const cells = tr.querySelectorAll('td');
+      // acum está en columna 9 (0-index: 0=N°, 1=alumno, 2=gén, 3-8=acts, 9=acum, 10=examen, 11=final)
+      if (cells[9]) cells[9].textContent = acum.toFixed(1);
+      if (cells[11]) {
+        cells[11].textContent = total;
+        cells[11].className = 'final-cell' + (total>=60?' pass':(total>0?' fail':''));
+      }
+    }
+  });
+}
+
+/* ============================================================
+   EXPORTAR / IMPORTAR (misma lógica original)
+   ============================================================ */
+function exportarParaAlumnos() {
+  let output = {};
+  Object.keys(DB).forEach(cKey => {
+    const curso = DB[cKey];
+    (curso.alumnos||[]).forEach(alu => {
+      if (!output[alu.id]) {
+        output[alu.id] = { nombre: alu.nombre, genero: alu.genero, asignaturas: {} };
+      }
+      const parcialI   = obtenerResumen(curso, 'I',   alu.id);
+      const parcialII  = obtenerResumen(curso, 'II',  alu.id);
+      const parcialIII = obtenerResumen(curso, 'III', alu.id);
+      const parcialIV  = obtenerResumen(curso, 'IV',  alu.id);
+
+      let sumaTotales = 0; let parcialesCursados = 0;
+      [parcialI, parcialII, parcialIII, parcialIV].forEach(p => {
+        if (p.cursado) { sumaTotales += p.total; parcialesCursados++; }
+      });
+      const promedioAnual = parcialesCursados > 0 ? Math.round(sumaTotales/parcialesCursados) : 0;
+
+      output[alu.id].asignaturas[curso.nombre] = {
+        I: parcialI, II: parcialII, III: parcialIII, IV: parcialIV,
+        promedioAnual: parcialesCursados > 0 ? promedioAnual : '-'
+      };
+    });
+  });
+
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(output, null, 2));
+  const a = document.createElement('a');
+  a.setAttribute("href", dataStr);
+  a.setAttribute("download", "notas_alumnos.json");
+  a.click();
+  toast('Archivo generado ✓', 'success');
+}
+
+function obtenerResumen(curso, pKey, aluId) {
+  const pData = curso.parciales[pKey];
+  const n = pData.notas[aluId] || { act: Array(6).fill(''), examen: '' };
+  let acum = 0; (n.act||[]).forEach(v => acum += (parseFloat(v)||0));
+  let examen = parseFloat(n.examen) || 0;
+  const cursado = (n.act||[]).some(v => v !== '') || n.examen !== '';
+  const nombresDeEsteParcial = curso.actividadesNombres?.[pKey] ||
+    ['Act. 1','Act. 2','Act. 3','Act. 4','Act. 5','Act. 6'];
+  return {
+    act: n.act,
+    nombresAct: nombresDeEsteParcial,
+    acum: parseFloat(acum.toFixed(1)),
+    examen: examen,
+    total: Math.round(acum + examen),
+    cursado: cursado
+  };
+}
+
+function importarDatos(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const datosCargados = JSON.parse(e.target.result);
+      if (!datosCargados || Object.keys(datosCargados).length === 0) return;
+
+      const primerasLlaves = Object.keys(datosCargados);
+      const esArchivoAlumno = datosCargados[primerasLlaves[0]].asignaturas !== undefined;
+
+      if (esArchivoAlumno) {
+        DB = {};
+        Object.keys(datosCargados).forEach(idAlu => {
+          const aluData = datosCargados[idAlu];
+          Object.keys(aluData.asignaturas).forEach(materiaNombre => {
+            const cKey = agregarCurso(materiaNombre);
+            if (!DB[cKey].alumnos.find(a=>a.id===idAlu)) {
+              DB[cKey].alumnos.push({ id:idAlu, nombre:aluData.nombre, genero:aluData.genero||'F', foto:'' });
+            }
+            ['I','II','III','IV'].forEach(pKey => {
+              const parcialInfo = aluData.asignaturas[materiaNombre][pKey];
+              if (parcialInfo && parcialInfo.cursado) {
+                DB[cKey].parciales[pKey].notas[idAlu] = {
+                  act: parcialInfo.act || [parcialInfo.acum,'','','','',''],
+                  examen: parcialInfo.examen !== 0 || parcialInfo.acum !== 0 ? parcialInfo.examen : ''
+                };
+                if (parcialInfo.nombresAct) DB[cKey].actividadesNombres[pKey] = parcialInfo.nombresAct;
+              }
+            });
+          });
+        });
+        save();
+        if (modoFirebase && isOnline) {
+          subirTodoAFirestore().then(() => toast('Datos importados y subidos a Firebase ✓','success'));
+        } else {
+          toast('¡Base de datos reconstruida con éxito!','success');
+        }
+        renderAll();
+      } else {
+        DB = datosCargados;
+        save();
+        if (modoFirebase && isOnline) {
+          subirTodoAFirestore().then(() => toast('Sincronización completa ✓','success'));
+        } else {
+          toast('¡Registros sincronizados con éxito!','success');
+        }
+        renderAll();
+      }
+    } catch(err) {
+      toast('Error al procesar el archivo.','error');
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+</script>
+</body>
+</html>
