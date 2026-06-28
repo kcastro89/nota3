@@ -115,7 +115,20 @@ tbody td{ padding: 12px 8px; text-align:center; vertical-align: middle; }
 </main>
 
 <script>
-const firebaseConfig = {
+  // 1. PRIMERO DECLARAMOS LAS VARIABLES Y CARGAMOS LOS DATOS LOCALES
+  let DB = {};
+  try {
+    DB = JSON.parse(localStorage.getItem('ips_esperanza_notas') || '{}');
+  } catch(e) {
+    console.error("Error cargando la base de datos local:", e);
+    DB = {};
+  }
+  
+  let activeCurso = null; 
+  let activeParcial = 'I';
+
+  // 2. LUEGO CONFIGURAMOS E INICIALIZAMOS FIREBASE
+  const firebaseConfig = {
     apiKey: "AIzaSyDTejqs2pgdGyTw1GNBhCr__joDXqpvnZk",
     authDomain: "portal-ips-san-pedro.firebaseapp.com",
     databaseURL: "https://portal-ips-san-pedro-default-rtdb.firebaseio.com",
@@ -124,13 +137,14 @@ const firebaseConfig = {
     messagingSenderId: "992828018359",
     appId: "1:992828018359:web:a4419792d82580d21c0732"
   };
+
   firebase.initializeApp(firebaseConfig);
   const database = firebase.database();
 
-  let DB = JSON.parse(localStorage.getItem('ips_esperanza_notas') || '{}');
-  let activeCurso = null; let activeParcial = 'I';
-
-  function save() { localStorage.setItem('ips_esperanza_notas', JSON.stringify(DB)); }
+  // 3. FUNCIONES DE GUARDADO Y CONTROL
+  function save() { 
+    localStorage.setItem('ips_esperanza_notas', JSON.stringify(DB)); 
+  }
 
   function agregarCurso(){
     const grado = document.getElementById('inp-grado').value;
@@ -145,7 +159,9 @@ const firebaseConfig = {
   }
 
   function renderCursosGrid(){
-    const grid = document.getElementById('cursos-grid'); grid.innerHTML = '';
+    const grid = document.getElementById('cursos-grid'); 
+    if(!grid) return;
+    grid.innerHTML = '';
     Object.keys(DB).forEach(key => {
       const div = document.createElement('div'); div.className = 'curso-chip' + (key === activeCurso ? ' active-curso' : '');
       div.innerHTML = `<span>${DB[key].nombre}</span> <span style="font-size:11px; opacity:0.8;">${DB[key].alumnos.length} alu.</span>`;
@@ -207,35 +223,45 @@ const firebaseConfig = {
   function eliminarAlu(id){ if(confirm('¿Desvincular alumno?')){ DB[activeCurso].alumnos = DB[activeCurso].alumnos.filter(a=>a.id!==id); save(); renderTabla(); } }
 
   function publicarEnNube() {
+    if(!DB || Object.keys(DB).length === 0) {
+      alert("No hay cursos ni notas guardadas de forma local para publicar. Crea un curso e inscribe un alumno primero.");
+      return;
+    }
+    
     let output = {};
     Object.keys(DB).forEach(cKey => {
       const curso = DB[cKey];
-      curso.alumnos.forEach(alu => {
-        if (!output[alu.id]) output[alu.id] = { nombre: alu.nombre, genero: alu.genero, asignaturas: {} };
-        
-        let sumaTotales = 0, parcialesCursados = 0;
-        ['I','II','III','IV'].forEach(pKey => {
-          const pData = curso.parciales[pKey];
-          const n = pData.notas[alu.id] || { act: Array(6).fill(''), examen: '' };
-          let acum = 0; n.act.forEach(v => acum += (parseFloat(v) || 0));
-          let examen = parseFloat(n.examen) || 0;
-          const cursado = n.act.some(v => v !== '') || n.examen !== '';
+      if (curso && curso.alumnos) {
+        curso.alumnos.forEach(alu => {
+          if (!output[alu.id]) output[alu.id] = { nombre: alu.nombre, genero: alu.genero, asignaturas: {} };
           
-          if(cursado) { sumaTotales += (acum + examen); parcialesCursados++; }
+          let sumaTotales = 0, parcialesCursados = 0;
+          ['I','II','III','IV'].forEach(pKey => {
+            const pData = curso.parciales[pKey];
+            const n = pData.notas[alu.id] || { act: Array(6).fill(''), examen: '' };
+            let acum = 0; n.act.forEach(v => acum += (parseFloat(v) || 0));
+            let examen = parseFloat(n.examen) || 0;
+            const cursado = n.act.some(v => v !== '') || n.examen !== '';
+            
+            if(cursado) { sumaTotales += (acum + examen); parcialesCursados++; }
+            
+            if(!output[alu.id].asignaturas[curso.nombre]) output[alu.id].asignaturas[curso.nombre] = {};
+            output[alu.id].asignaturas[curso.nombre][pKey] = { total: cursado ? Math.round(acum + examen) : '-' };
+          });
           
-          if(!output[alu.id].asignaturas[curso.nombre]) output[alu.id].asignaturas[curso.nombre] = {};
-          output[alu.id].asignaturas[curso.nombre][pKey] = { total: cursado ? Math.round(acum + examen) : '-' };
+          if(parcialesCursados > 0) {
+            output[alu.id].asignaturas[curso.nombre].promedioAnual = Math.round(sumaTotales / parcialesCursados);
+          }
         });
-        
-        if(parcialesCursados > 0) {
-          output[alu.id].asignaturas[curso.nombre].promedioAnual = Math.round(sumaTotales / parcialesCursados);
-        }
-      });
+      }
     });
 
     database.ref('notas_publicadas').set(output).then(() => {
       alert("¡Calificaciones subidas a la nube con éxito! Tus alumnos ya pueden revisarlas.");
-    }).catch(() => alert("Error al conectar con la base de datos."));
+    }).catch((err) => {
+      console.error(err);
+      alert("Error al conectar con la base de datos.");
+    });
   }
 
   function importarDatos(input) {
@@ -250,7 +276,12 @@ const firebaseConfig = {
     reader.readAsText(file);
   }
 
-  window.onload = function(){ renderCursosGrid(); };
+  // 4. INICIALIZACIÓN AUTOMÁTICA AL CARGAR LA PÁGINA
+  window.onload = function(){ 
+    renderCursosGrid(); 
+  };
 </script>
+  </body>
+  </html>
 </body>
 </html>
