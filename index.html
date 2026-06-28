@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal Estudiantil — IPSPT</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+<!-- Firebase SDK v10 (compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
+<style>
+/* ============================================================
+   TOKENS DE DISEÑO (mismos que panel docente)
+   ============================================================ */
+:root {
+  --p700: #6C5F8D;
+  --p500: #9C8CB9;
+  --p300: #BA96C1;
+  --p100: #DCD7D5;
+  --p50:  #F5F3F8;
+
+  --surface:  #FFFFFF;
+  --surface2: #F8F7FB;
+  --surface3: #F0EEF6;
+  --border:   #E8E4F0;
+  --border-md:#C8C0DC;
+
+  --text:    #1A1625;
+  --text-md: #4A4360;
+  --text-sm: #7E7A94;
+
+  --pass:    #2E7D52;
+  --pass-bg: #E8F5EE;
+  --fail:    #B34040;
+  --fail-bg: #FDEAEA;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --shadow-sm: 0 4px 12px rgba(108,95,141,.10);
+  --shadow-md: 0 8px 24px rgba(108,95,141,.14);
+  --shadow-lg: 0 16px 48px rgba(108,95,141,.18);
+
+  --anim: .22s cubic-bezier(.4,0,.2,1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+  background: linear-gradient(135deg, #F5F3F8 0%, #EDE9F4 50%, #E3DDF0 100%);
+  min-height: 100vh;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   PANTALLA DE ACCESO
+   ============================================================ */
+#login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.login-card {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 44px 36px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp .4s ease both;
+}
+.login-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--p700), var(--p300));
+}
+.school-logo {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: var(--p50);
+  border: 3px solid var(--p300);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+  font-size: 32px;
+  overflow: hidden;
+}
+.school-logo img { width: 100%; height: 100%; object-fit: cover; }
+.login-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 700;
+  color: var(--p700);
+}
+.login-sub { font-size: 12px; color: var(--text-sm); margin-top: 4px; }
+.login-form { margin-top: 28px; text-align: left; }
+.field-label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--text-md);
+  display: block; margin-bottom: 6px;
+}
+.field-input {
+  width: 100%; padding: 12px 14px;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 15px; color: var(--text);
+  letter-spacing: .08em;
+  transition: border-color var(--anim), box-shadow var(--anim);
+  outline: none; font-family: 'Inter', sans-serif;
+}
+.field-input:focus {
+  border-color: var(--p700);
+  box-shadow: 0 0 0 3px rgba(108,95,141,.12);
+  background: #fff;
+}
+.error-msg {
+  margin-top: 10px;
+  font-size: 12px; color: var(--fail);
+  background: var(--fail-bg);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  display: none;
+}
+.btn-ingresar {
+  margin-top: 16px; width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, var(--p700), var(--p500));
+  color: #fff; border: none; border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: opacity var(--anim), transform var(--anim);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-ingresar:hover { opacity: .88; transform: translateY(-1px); }
+.hint-text {
+  font-size: 11px; color: var(--text-sm);
+  margin-top: 20px; line-height: 1.6;
+}
+
+/* ============================================================
+   PANTALLA PRINCIPAL DEL ALUMNO
+   ============================================================ */
+#app-screen {
+  display: none;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 20px 16px 48px;
+}
+
+/* Header del alumno */
+.alumno-header {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  padding: 28px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp .35s ease both;
+}
+.alumno-header::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--p700), var(--p300));
+}
+.foto-container {
+  position: relative; flex-shrink: 0;
+}
+.foto-alumno {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  border: 3px solid var(--p300);
+  object-fit: cover;
+  display: block;
+}
+.foto-default {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--p700), var(--p300));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 700; color: #fff;
+  border: 3px solid var(--p300);
+  cursor: pointer;
+}
+.foto-upload-btn {
+  position: absolute; bottom: 0; right: 0;
+  width: 26px; height: 26px;
+  background: var(--p700); color: #fff;
+  border-radius: 50%; border: 2px solid #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; cursor: pointer;
+  transition: background var(--anim);
+}
+.foto-upload-btn:hover { background: var(--p500); }
+#input-foto { display: none; }
+.alumno-info { flex: 1; min-width: 0; }
+.alumno-nombre {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 700; color: var(--text);
+  line-height: 1.2;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.alumno-id {
+  font-size: 12px; color: var(--text-sm);
+  letter-spacing: .06em;
+  margin-top: 4px;
+}
+.alumno-badge {
+  margin-top: 10px;
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--p50);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 11px; font-weight: 600; color: var(--p700);
+}
+.btn-salir {
+  margin-left: auto; flex-shrink: 0;
+  padding: 7px 12px;
+  background: transparent; border: 1.5px solid var(--border-md);
+  border-radius: var(--radius-sm); color: var(--text-sm);
+  font-size: 12px; cursor: pointer;
+  transition: all var(--anim); align-self: flex-start;
+}
+.btn-salir:hover { background: var(--fail-bg); color: var(--fail); border-color: var(--fail); }
+
+/* Subida de foto - estado */
+.foto-status {
+  font-size: 11px; color: var(--text-sm);
+  margin-top: 6px;
+}
+
+/* Tarjeta de asignatura */
+.asig-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+  overflow: hidden;
+  animation: fadeInUp .35s ease both;
+}
+.asig-header {
+  padding: 16px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  background: linear-gradient(135deg, var(--surface), var(--p50));
+  border-bottom: 1px solid var(--border);
+}
+.asig-nombre {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px; font-weight: 700; color: var(--p700);
+  display: flex; align-items: center; gap: 8px;
+}
+.asig-nombre i { font-size: 13px; color: var(--p500); }
+.asig-promedio-badge {
+  font-size: 18px; font-weight: 800;
+  display: flex; align-items: center; gap: 8px;
+}
+.asig-promedio-badge .num { color: var(--p700); }
+.asig-promedio-badge .num.pass { color: var(--pass); }
+.asig-promedio-badge .num.fail { color: var(--fail); }
+.chevron {
+  font-size: 12px; color: var(--text-sm);
+  transition: transform var(--anim);
+}
+.asig-card.open .chevron { transform: rotate(180deg); }
+.asig-body { display: none; padding: 0 20px 16px; }
+.asig-card.open .asig-body { display: block; }
+
+/* Tabla parciales */
+.parciales-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 14px;
+}
+@media (max-width: 480px) {
+  .parciales-grid { grid-template-columns: 1fr; }
+}
+.parcial-box {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+}
+.parcial-titulo {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .07em; color: var(--p700);
+  margin-bottom: 8px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.parcial-nota-grande {
+  font-size: 28px; font-weight: 800; line-height: 1;
+  color: var(--text);
+}
+.parcial-nota-grande.pass { color: var(--pass); }
+.parcial-nota-grande.fail { color: var(--fail); }
+.parcial-desglose {
+  margin-top: 8px;
+  font-size: 11px; color: var(--text-sm);
+  line-height: 1.8;
+}
+.parcial-desglose .row {
+  display: flex; justify-content: space-between;
+  border-bottom: 1px dashed var(--border);
+  padding: 2px 0;
+}
+.parcial-desglose .row:last-child { border-bottom: none; }
+.parcial-desglose .row span:last-child { font-weight: 600; color: var(--text-md); }
+.no-cursado {
+  font-size: 12px; color: var(--text-sm);
+  font-style: italic; margin-top: 4px;
+}
+
+/* Promedio anual resumen */
+.resumen-anual {
+  background: linear-gradient(135deg, var(--p700), var(--p500));
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin-top: 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  color: #fff;
+}
+.resumen-anual .lbl { font-size: 12px; opacity: .85; }
+.resumen-anual .val { font-size: 22px; font-weight: 800; }
+
+/* Sección título */
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px; font-weight: 700; color: var(--p700);
+  margin: 24px 0 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-title i { font-size: 13px; color: var(--p500); }
+
+/* Empty state */
+.empty-state {
+  text-align: center; padding: 48px 20px;
+  color: var(--text-sm); font-size: 13px;
+}
+.empty-state i { font-size: 40px; margin-bottom: 14px; color: var(--p300); display: block; }
+
+/* ============================================================
+   LOADING
+   ============================================================ */
+#loading-overlay {
+  position: fixed; inset: 0; z-index: 9990;
+  background: rgba(245,243,248,.85);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 14px;
+}
+.spinner {
+  width: 44px; height: 44px;
+  border: 3px solid var(--p100);
+  border-top-color: var(--p700);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+#loading-overlay p { font-size: 13px; color: var(--text-sm); }
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+#toast {
+  position: fixed; bottom: 24px; right: 16px; left: 16px;
+  max-width: 360px; margin: 0 auto;
+  z-index: 9998;
+  background: var(--text); color: #fff;
+  padding: 12px 18px; border-radius: var(--radius-md);
+  font-size: 13px; font-weight: 500;
+  box-shadow: var(--shadow-md);
+  transform: translateY(120px); opacity: 0;
+  transition: all .3s cubic-bezier(.4,0,.2,1);
+  display: flex; align-items: center; gap: 8px;
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+#toast.success { background: var(--pass); }
+#toast.error   { background: var(--fail); }
+#toast.info    { background: var(--p700); }
+
+/* ============================================================
+   ANIMACIONES
+   ============================================================ */
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading-overlay" class="hidden">
+  <div class="spinner"></div>
+  <p id="loading-msg">Cargando…</p>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ============================================================
+     PANTALLA DE ACCESO
+     ============================================================ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="school-logo" id="school-logo-wrap">
+      <i class="fa fa-school" style="color:var(--p700);"></i>
+    </div>
+    <div class="login-title">Portal Estudiantil</div>
+    <div class="login-sub">IPSPT · Karla Castro · Matemáticas</div>
+    <div class="login-sub" style="margin-top:2px;">Instituto Polivalente San Pedro de Tutule</div>
+
+    <div class="login-form">
+      <label class="field-label">Número de identidad (13 dígitos)</label>
+      <input class="field-input" type="tel" id="inp-identidad"
+        maxlength="13" placeholder="0000000000000" inputmode="numeric"
+        onkeydown="if(event.key==='Enter') buscarAlumno()">
+      <div class="error-msg" id="login-error"></div>
+      <button class="btn-ingresar" onclick="buscarAlumno()">
+        <i class="fa fa-search"></i> Consultar mis notas
+      </button>
+    </div>
+    <p class="hint-text">
+      Ingresa tu número de identidad para ver tus calificaciones.<br>
+      Si no apareces en el sistema, consulta a tu docente.
+    </p>
+  </div>
+</div>
+
+<!-- ============================================================
+     PANTALLA PRINCIPAL DEL ALUMNO
+     ============================================================ -->
+<div id="app-screen">
+
+  <!-- Header alumno -->
+  <div class="alumno-header">
+    <div class="foto-container">
+      <div class="foto-default" id="foto-default-el" onclick="document.getElementById('input-foto').click()" title="Subir mi foto"></div>
+      <img class="foto-alumno hidden" id="foto-img-el" alt="Mi foto" onclick="document.getElementById('input-foto').click()">
+      <div class="foto-upload-btn" onclick="document.getElementById('input-foto').click()" title="Cambiar foto">
+        <i class="fa fa-camera"></i>
+      </div>
+      <input type="file" id="input-foto" accept="image/*" capture="user" onchange="subirFoto(this)">
+    </div>
+    <div class="alumno-info">
+      <div class="alumno-nombre" id="alu-nombre-el">—</div>
+      <div class="alumno-id" id="alu-id-el"></div>
+      <div class="alumno-badge" id="alu-badge-el">
+        <i class="fa fa-user-graduate"></i>
+        <span>Estudiante</span>
+      </div>
+      <div class="foto-status" id="foto-status-el"></div>
+    </div>
+    <button class="btn-salir" onclick="cerrarSesion()" title="Salir">
+      <i class="fa fa-sign-out-alt"></i> Salir
+    </button>
+  </div>
+
+  <!-- Asignaturas -->
+  <div class="section-title"><i class="fa fa-book"></i> Mis Calificaciones</div>
+  <div id="asignaturas-container">
+    <div class="empty-state">
+      <i class="fa fa-book-open"></i>
+      Sin asignaturas registradas todavía.
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+/* ============================================================
+   CONFIG FIREBASE (mismo proyecto que el panel docente)
+   ============================================================ */
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyDTejqs2pgdGyTw1GNBhCr__joDXqpvnZk",
+  authDomain:        "portal-ips-san-pedro.firebaseapp.com",
+  projectId:         "portal-ips-san-pedro",
+  storageBucket:     "portal-ips-san-pedro.firebasestorage.app",
+  messagingSenderId: "992828018359",
+  appId:             "1:992828018359:web:a4419792d82580d21c0732"
+};
+
+/* ============================================================
+   ESTADO GLOBAL
+   ============================================================ */
+let db = null, storage = null;
+let alumnoActual = null;   // { id, nombre, genero, foto }
+let cursosDelAlumno = [];  // [{ cursoKey, cursoNombre, parciales, actividadesNombres }]
+
+/* ============================================================
+   INIT
+   ============================================================ */
+window.onload = function() {
+  try {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db      = firebase.firestore();
+    storage = firebase.storage();
+  } catch(e) {
+    console.warn('Firebase init error:', e);
+    mostrarError('No se pudo conectar al servidor. Verifica tu conexión.');
+  }
+
+  // Restaurar logo escolar si fue guardado por el docente
+  const logo = localStorage.getItem('ipspt_logo');
+  if (logo) {
+    const logoWrap = document.getElementById('school-logo-wrap');
+    logoWrap.innerHTML = `<img src="${logo}" alt="Logo IPSPT">`;
+  }
+};
+
+/* ============================================================
+   BUSCAR ALUMNO EN FIRESTORE
+   ============================================================ */
+async function buscarAlumno() {
+  const idInput = document.getElementById('inp-identidad').value.trim().replace(/\D/g,'');
+  const errEl   = document.getElementById('login-error');
+  errEl.style.display = 'none';
+
+  if (idInput.length !== 13) {
+    errEl.textContent = 'La identidad debe tener exactamente 13 dígitos.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  showLoading('Buscando tus notas…');
+
+  try {
+    const snap = await db.collection('cursos').get();
+    if (snap.empty) {
+      hideLoading();
+      mostrarError('No hay datos en el sistema todavía. Consulta a tu docente.');
+      return;
+    }
+
+    let encontrado = false;
+    let infoAlumno = null;
+    cursosDelAlumno = [];
+
+    snap.forEach(doc => {
+      const curso = doc.data();
+      const alumno = (curso.alumnos || []).find(a => a.id === idInput);
+      if (alumno) {
+        if (!encontrado) {
+          encontrado = true;
+          infoAlumno = alumno;
+        }
+        cursosDelAlumno.push({
+          cursoKey:  doc.id,
+          cursoNombre: curso.nombre,
+          parciales: curso.parciales || {},
+          actividadesNombres: curso.actividadesNombres || {}
+        });
+      }
+    });
+
+    hideLoading();
+
+    if (!encontrado) {
+      mostrarError('No se encontró ningún alumno con esa identidad. Verifica el número o consulta a tu docente.');
+      return;
+    }
+
+    alumnoActual = infoAlumno;
+    mostrarPanelAlumno();
+
+  } catch(e) {
+    hideLoading();
+    mostrarError('Error al conectar: ' + e.message);
+  }
+}
+
+function mostrarError(msg) {
+  const errEl = document.getElementById('login-error');
+  errEl.textContent = msg;
+  errEl.style.display = 'block';
+}
+
+/* ============================================================
+   MOSTRAR PANEL DEL ALUMNO
+   ============================================================ */
+function mostrarPanelAlumno() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display   = 'block';
+
+  // Nombre e ID
+  document.getElementById('alu-nombre-el').textContent = alumnoActual.nombre;
+  document.getElementById('alu-id-el').textContent     = 'ID: ' + alumnoActual.id;
+
+  // Badge género
+  const badge = document.getElementById('alu-badge-el');
+  const genLabel = alumnoActual.genero === 'F' ? 'Alumna' : 'Alumno';
+  badge.querySelector('span').textContent = genLabel;
+
+  // Iniciales para foto default
+  const initials = alumnoActual.nombre.trim().split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
+  document.getElementById('foto-default-el').textContent = initials;
+
+  // Foto si existe
+  if (alumnoActual.foto) {
+    mostrarFotoImg(alumnoActual.foto);
+  }
+
+  // Renderizar asignaturas
+  renderAsignaturas();
+}
+
+/* ============================================================
+   RENDER ASIGNATURAS
+   ============================================================ */
+function renderAsignaturas() {
+  const container = document.getElementById('asignaturas-container');
+  container.innerHTML = '';
+
+  if (cursosDelAlumno.length === 0) {
+    container.innerHTML = `<div class="empty-state"><i class="fa fa-book-open"></i>Sin asignaturas registradas.</div>`;
+    return;
+  }
+
+  cursosDelAlumno.forEach((curso, ci) => {
+    const cardId = 'asig-' + ci;
+    const card   = document.createElement('div');
+    card.className = 'asig-card';
+    card.id = cardId;
+
+    // Calcular promedio anual
+    let sumaTotales = 0; let cursados = 0;
+    const parcialesData = {};
+    ['I','II','III','IV'].forEach(p => {
+      const resumen = calcularParcial(curso, p);
+      parcialesData[p] = resumen;
+      if (resumen.cursado) { sumaTotales += resumen.total; cursados++; }
+    });
+    const promedioAnual = cursados > 0 ? Math.round(sumaTotales / cursados) : null;
+    const pasoAnual     = promedioAnual !== null && promedioAnual >= 60;
+
+    // Header de la tarjeta
+    const promedioHtml = promedioAnual !== null
+      ? `<span class="asig-promedio-badge">
+          <span class="num ${pasoAnual ? 'pass' : 'fail'}">${promedioAnual}</span>
+          <i class="chevron fa fa-chevron-down"></i>
+        </span>`
+      : `<span style="font-size:12px;color:var(--text-sm);">Sin notas <i class="chevron fa fa-chevron-down"></i></span>`;
+
+    card.innerHTML = `
+      <div class="asig-header" onclick="toggleCard('${cardId}')">
+        <div class="asig-nombre"><i class="fa fa-book-open"></i>${curso.cursoNombre}</div>
+        ${promedioHtml}
+      </div>
+      <div class="asig-body">
+        ${renderParciales(parcialesData, curso)}
+        ${promedioAnual !== null ? `
+          <div class="resumen-anual">
+            <div>
+              <div class="lbl">Promedio Anual</div>
+              <div style="font-size:11px;opacity:.7;">${cursados} parcial(es) cursado(s)</div>
+            </div>
+            <div class="val">${promedioAnual}</div>
+          </div>` : ''}
+      </div>
+    `;
+    container.appendChild(card);
+    // Abrir la primera tarjeta por defecto
+    if (ci === 0) toggleCard(cardId);
+  });
+}
+
+function renderParciales(parcialesData, curso) {
+  let html = '<div class="parciales-grid">';
+  ['I','II','III','IV'].forEach(p => {
+    const d = parcialesData[p];
+    html += `<div class="parcial-box">
+      <div class="parcial-titulo">
+        <span>${p} Parcial</span>
+        ${d.cursado ? `<span style="font-size:10px; padding:2px 7px; border-radius:10px; background:${d.total>=60?'var(--pass-bg)':'var(--fail-bg)'}; color:${d.total>=60?'var(--pass)':'var(--fail)'}; font-weight:700;">${d.total>=60?'APROBADO':'REPROBADO'}</span>` : ''}
+      </div>`;
+    if (!d.cursado) {
+      html += `<div class="no-cursado">Sin notas registradas</div>`;
+    } else {
+      html += `
+        <div class="parcial-nota-grande ${d.total>=60?'pass':'fail'}">${d.total}</div>
+        <div class="parcial-desglose">`;
+      // Actividades con nombre
+      const nombres = curso.actividadesNombres?.[p] || [];
+      const acts = d.act || [];
+      acts.forEach((v, i) => {
+        if (v !== '' && v !== undefined && v !== null) {
+          const nombre = nombres[i] || ('Act. '+(i+1));
+          html += `<div class="row"><span>${nombre}</span><span>${parseFloat(v)||0}</span></div>`;
+        }
+      });
+      html += `
+          <div class="row" style="margin-top:2px;"><span>Acumulado</span><span>${d.acum}</span></div>
+          <div class="row"><span>Examen</span><span>${d.examen}</span></div>
+          <div class="row" style="font-weight:700;"><span>Total Parcial</span><span>${d.total}</span></div>
+        </div>`;
+    }
+    html += `</div>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+function calcularParcial(curso, pKey) {
+  const pData = (curso.parciales || {})[pKey] || {};
+  const n = (pData.notas || {})[alumnoActual.id] || { act: Array(6).fill(''), examen: '' };
+  let acum = 0;
+  (n.act || []).forEach(v => acum += (parseFloat(v) || 0));
+  const examen  = parseFloat(n.examen) || 0;
+  const total   = Math.round(acum + examen);
+  const cursado = (n.act || []).some(v => v !== '' && v !== null && v !== undefined) || n.examen !== '';
+  return { act: n.act, acum: parseFloat(acum.toFixed(1)), examen, total, cursado };
+}
+
+function toggleCard(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+/* ============================================================
+   SUBIR FOTO
+   ============================================================ */
+async function subirFoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  // Validar tamaño (máx 3 MB)
+  if (file.size > 3 * 1024 * 1024) {
+    toast('La imagen es muy grande. Máximo 3 MB.', 'error');
+    return;
+  }
+
+  const statusEl = document.getElementById('foto-status-el');
+  statusEl.textContent = 'Subiendo foto…';
+  showLoading('Subiendo tu foto…');
+
+  try {
+    // Subir a Firebase Storage
+    const ref = storage.ref(`fotos_alumnos/${alumnoActual.id}.jpg`);
+    await ref.put(file, { contentType: file.type });
+    const url = await ref.getDownloadURL();
+
+    // Actualizar foto en TODOS los cursos del alumno en Firestore
+    const batch = db.batch();
+    cursosDelAlumno.forEach(curso => {
+      const docRef = db.collection('cursos').doc(curso.cursoKey);
+      // Necesitamos leer primero el documento para hacer la actualización correctamente
+      // Usamos el campo con arrayUnion no funciona para objetos, así que actualizamos directo
+    });
+
+    // Actualizar en Firestore: buscar y actualizar el campo foto de cada curso
+    const snap = await db.collection('cursos').get();
+    const updates = [];
+    snap.forEach(doc => {
+      const data = doc.data();
+      const alumnos = data.alumnos || [];
+      const idx = alumnos.findIndex(a => a.id === alumnoActual.id);
+      if (idx !== -1) {
+        alumnos[idx].foto = url;
+        updates.push(db.collection('cursos').doc(doc.id).update({ alumnos }));
+      }
+    });
+    await Promise.all(updates);
+
+    // Actualizar UI
+    alumnoActual.foto = url;
+    mostrarFotoImg(url);
+    hideLoading();
+    statusEl.textContent = '';
+    toast('¡Foto actualizada con éxito! ✓', 'success');
+
+  } catch(e) {
+    hideLoading();
+    document.getElementById('foto-status-el').textContent = '';
+    toast('Error al subir la foto: ' + e.message, 'error');
+    console.error(e);
+  }
+  input.value = '';
+}
+
+function mostrarFotoImg(src) {
+  document.getElementById('foto-default-el').style.display = 'none';
+  const img = document.getElementById('foto-img-el');
+  img.src = src;
+  img.classList.remove('hidden');
+}
+
+/* ============================================================
+   CERRAR SESIÓN
+   ============================================================ */
+function cerrarSesion() {
+  alumnoActual = null;
+  cursosDelAlumno = [];
+  document.getElementById('inp-identidad').value = '';
+  document.getElementById('login-error').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  // Resetear foto
+  document.getElementById('foto-default-el').style.display = 'flex';
+  document.getElementById('foto-img-el').classList.add('hidden');
+}
+
+/* ============================================================
+   UTILIDADES
+   ============================================================ */
+function showLoading(msg) {
+  document.getElementById('loading-msg').textContent = msg || 'Cargando…';
+  document.getElementById('loading-overlay').classList.remove('hidden');
+}
+function hideLoading() {
+  document.getElementById('loading-overlay').classList.add('hidden');
+}
+
+let toastTimer;
+function toast(msg, type = 'info') {
+  const el = document.getElementById('toast');
+  const icons = { success: '✓', error: '✕', info: 'ℹ' };
+  el.innerHTML = `<span>${icons[type]||'ℹ'}</span> ${msg}`;
+  el.className = `show ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.className = '', 3500);
+}
+</script>
+</body>
+</html>
